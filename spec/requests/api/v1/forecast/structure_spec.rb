@@ -3,21 +3,23 @@ require 'rails_helper'
 RSpec.describe 'Forecast' do
   describe 'General Structure' do
     it 'is correct' do
-      get api_v1_forecast_path(location: 'denver,co')
+      VCR.use_cassette('denver_weather_request') do
+        get api_v1_forecast_path(location: 'denver,co')
 
-      expect(response).to be_successful
-      body = JSON.parse(response.body, symbolize_names: true)
+        expect(response).to be_successful
+        body = JSON.parse(response.body, symbolize_names: true)
 
-      expect(body.length).to eq(1)
-      expect(body[:data]).to be_a(Hash)
-      expect(body[:data].length).to eq(3)
+        expect(body.length).to eq(1)
+        expect(body[:data]).to be_a(Hash)
+        expect(body[:data].length).to eq(3)
 
-      data = body[:data]
-      expect(data.keys).to eq([:id, :type, :attributes])
-      expect(data[:id]).to eq(nil)
-      expect(data[:type]).to eq('forecast')
-      expect(data[:attributes]).to be_a(Hash)
-      expect(data[:attributes].keys).to eq([:current_weather, :daily_weather, :hourly_weather])
+        data = body[:data]
+        expect(data.keys).to eq([:id, :type, :attributes])
+        expect(data[:id]).to eq(nil)
+        expect(data[:type]).to eq('forecast')
+        expect(data[:attributes]).to be_a(Hash)
+        expect(data[:attributes].keys).to eq([:current_weather, :daily_weather, :hourly_weather])
+      end
     end
   end
 
