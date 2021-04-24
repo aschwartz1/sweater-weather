@@ -89,7 +89,19 @@ class Api::V1::ForecastController < ApplicationController
   end
 
   def parse_hourly_weather(body, hours)
-    []
+    return [] unless hours.positive?
+
+    offset = body[:timezone_offset]
+    hourly = body[:hourly]
+
+    (1..hours).map do |i|
+      {
+        time: local_time_from_unix(hourly[i][:dt], offset).strftime('%T'),
+        temperature: hourly[i][:temp],
+        conditions: hourly[i][:weather].first[:description],
+        icon: hourly[i][:weather].first[:icon],
+      }
+    end
   end
 
   def local_time_from_unix(timestamp, offset)
