@@ -33,9 +33,9 @@ class Api::V1::ForecastController < ApplicationController
 
   def fetch_current_weather(geocoords)
     response = weather_connection.get('onecall') do |req|
-      req.params[:lat] = geocoords.latitude,
-      req.params[:long] = geocoords.longitude,
-      req.params[:units] = 'imperial',
+      req.params[:lat] = geocoords.latitude
+      req.params[:lon] = geocoords.longitude
+      req.params[:units] = 'imperial'
       req.params[:exclude] = 'minutely,alerts'
     end
 
@@ -53,17 +53,19 @@ class Api::V1::ForecastController < ApplicationController
   end
 
   def parse_current_weather(body)
+    current = body[:current]
+    require "pry"; binding.pry
     {
-      datetime: beautify_datetime(''),
-      sunrise: beautify_datetime(''),
-      sunset: '',
-      temperature: 0.0,
-      feels_like: 0.0,
-      humidity: 0.0,
-      uvi: 0.0,
-      visibility: 0,
-      conditions: '',
-      icon: ''
+      datetime: beautify_datetime(current[:dt]),
+      sunrise: beautify_datetime(current[:sunrise]),
+      sunset: beautify_datetime(current[:sunset]),
+      temperature: current[:temp],
+      feels_like: current[:feels_like],
+      humidity: current[:humidity],
+      uvi: current[:uvi],
+      visibility: current[:visibility],
+      conditions: current[:weather].first[:description],
+      icon: current[:weather].first[:icon]
     }
   end
 
@@ -76,7 +78,7 @@ class Api::V1::ForecastController < ApplicationController
   end
 
   def beautify_datetime(datetime)
-    'TODO'
+    datetime = 'TODO'
   end
   # END WeatherService
 
