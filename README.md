@@ -5,7 +5,7 @@ The Back End API portion of a proposed SOA application to plan road trips. This 
 
 # Contents
 1. [Endpoints](#endpoints)
-  - [Weather Data for a City](#weather-data-for-a-city)
+    - [Weather Data for a City](#weather-data-for-a-city)
 
 # Endpoints
 ## Weather Data for a City
