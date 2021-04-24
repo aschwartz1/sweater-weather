@@ -53,12 +53,12 @@ class Api::V1::ForecastController < ApplicationController
   end
 
   def parse_current_weather(body)
+    offset = body[:timezone_offset]
     current = body[:current]
-    require "pry"; binding.pry
     {
-      datetime: beautify_datetime(current[:dt]),
-      sunrise: beautify_datetime(current[:sunrise]),
-      sunset: beautify_datetime(current[:sunset]),
+      datetime: format_unix_timestamp(current[:dt], offset),
+      sunrise: format_unix_timestamp(current[:sunrise], offset),
+      sunset: format_unix_timestamp(current[:sunset], offset),
       temperature: current[:temp],
       feels_like: current[:feels_like],
       humidity: current[:humidity],
@@ -77,8 +77,8 @@ class Api::V1::ForecastController < ApplicationController
     []
   end
 
-  def beautify_datetime(datetime)
-    datetime = 'TODO'
+  def format_unix_timestamp(timestamp, offset)
+    Time.find_zone(offset).at(timestamp).to_s
   end
   # END WeatherService
 
