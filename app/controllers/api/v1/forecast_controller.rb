@@ -17,6 +17,7 @@ class Api::V1::ForecastController < ApplicationController
   def validate_params
     # Desired format like `denver,co`
     render json: '', status: :bad_request and return if params[:location].blank?
+
     split = params[:location].split(',')
     # Location exists but is not in correct `city,state` format
     render json: '', status: :bad_request and return unless split.size == 2
@@ -52,6 +53,7 @@ class Api::V1::ForecastController < ApplicationController
     })
   end
 
+  # rubocop:disable Metrics/MethodLength
   def parse_current_weather(body)
     offset = body[:timezone_offset]
     current = body[:current]
@@ -68,7 +70,9 @@ class Api::V1::ForecastController < ApplicationController
       icon: current[:weather].first[:icon]
     }
   end
+  # rubocop:enable Metrics/MethodLength
 
+  # rubocop:disable Metrics/MethodLength
   def parse_daily_weather(body, days)
     return [] unless days.positive?
 
@@ -83,11 +87,13 @@ class Api::V1::ForecastController < ApplicationController
         max_temp: daily[i][:temp][:max],
         min_temp: daily[i][:temp][:min],
         conditions: daily[i][:weather].first[:description],
-        icon: daily[i][:weather].first[:icon],
+        icon: daily[i][:weather].first[:icon]
       }
     end
   end
+  # rubocop:enable Metrics/MethodLength
 
+  # rubocop:disable Metrics/MethodLength
   def parse_hourly_weather(body, hours)
     return [] unless hours.positive?
 
@@ -99,10 +105,11 @@ class Api::V1::ForecastController < ApplicationController
         time: local_time_from_unix(hourly[i][:dt], offset).strftime('%T'),
         temperature: hourly[i][:temp],
         conditions: hourly[i][:weather].first[:description],
-        icon: hourly[i][:weather].first[:icon],
+        icon: hourly[i][:weather].first[:icon]
       }
     end
   end
+  # rubocop:enable Metrics/MethodLength
 
   def local_time_from_unix(timestamp, offset)
     Time.find_zone(offset).at(timestamp)
