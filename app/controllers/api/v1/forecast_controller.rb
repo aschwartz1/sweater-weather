@@ -2,11 +2,11 @@ class Api::V1::ForecastController < ApplicationController
   before_action :validate_params
 
   def show
-    # fetch_current_weather(params[:location])
+    current_weather = fetch_current_weather(params[:location])
 
     complete_response = OpenStruct.new({
       id: nil,
-      current_weather: {},
+      current_weather: current_weather,
       daily_weather: [],
       hourly_weather: []
     })
