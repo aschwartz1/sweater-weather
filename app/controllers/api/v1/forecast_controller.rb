@@ -56,9 +56,9 @@ class Api::V1::ForecastController < ApplicationController
     offset = body[:timezone_offset]
     current = body[:current]
     {
-      datetime: format_unix_timestamp(current[:dt], offset),
-      sunrise: format_unix_timestamp(current[:sunrise], offset),
-      sunset: format_unix_timestamp(current[:sunset], offset),
+      datetime: local_time_from_unix(current[:dt], offset).to_s,
+      sunrise: local_time_from_unix(current[:sunrise], offset).to_s,
+      sunset: local_time_from_unix(current[:sunset], offset).to_s,
       temperature: current[:temp],
       feels_like: current[:feels_like],
       humidity: current[:humidity],
@@ -70,15 +70,30 @@ class Api::V1::ForecastController < ApplicationController
   end
 
   def parse_daily_weather(body, days)
-    []
+    return [] unless days.positive?
+
+    offset = body[:timezone_offset]
+    daily = body[:daily]
+
+    (1..days).map do |i|
+      {
+        date: local_time_from_unix(daily[i][:dt], offset).strftime('%F'),
+        sunrise: local_time_from_unix(daily[i][:sunrise], offset).to_s,
+        sunset: local_time_from_unix(daily[i][:sunset], offset).to_s,
+        max_temp: daily[i][:temp][:max],
+        min_temp: daily[i][:temp][:min],
+        conditions: daily[i][:weather].first[:description],
+        icon: daily[i][:weather].first[:icon],
+      }
+    end
   end
 
   def parse_hourly_weather(body, hours)
     []
   end
 
-  def format_unix_timestamp(timestamp, offset)
-    Time.find_zone(offset).at(timestamp).to_s
+  def local_time_from_unix(timestamp, offset)
+    Time.find_zone(offset).at(timestamp)
   end
   # END WeatherService
 
