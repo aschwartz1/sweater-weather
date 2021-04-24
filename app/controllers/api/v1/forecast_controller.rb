@@ -2,20 +2,14 @@ class Api::V1::ForecastController < ApplicationController
   before_action :validate_params
 
   def show
-    current_weather = fetch_current_weather(params[:location])
+    geocords = fetch_geocoords(params[:location])
 
-    complete_response = OpenStruct.new({
-      id: nil,
-      current_weather: current_weather,
-      daily_weather: [],
-      hourly_weather: []
-    })
+    current_weather = fetch_current_weather(geocords)
+    current_weather[:id] = nil
+
+    complete_response = OpenStruct.new(current_weather)
 
     render json: ForecastSerializer.new(complete_response)
-  end
-
-  def fetch_current_weather(location)
-    geocoords = fetch_geocoords(location)
   end
 
   private
@@ -31,7 +25,59 @@ class Api::V1::ForecastController < ApplicationController
   end
 
   # BEGIN WeatherService
+  def weather_connection
+    @weather_connection ||= Faraday.new 'https://api.openweathermap.org/data/2.5' do |conn|
+      conn.params[:appid] = ENV['openweather_key']
+    end
+  end
 
+  def fetch_current_weather(geocoords)
+    response = weather_connection.get('onecall') do |req|
+      req.params[:lat] = geocoords.latitude,
+      req.params[:long] = geocoords.longitude,
+      req.params[:units] = 'imperial',
+      req.params[:exclude] = 'minutely,alerts'
+    end
+
+    format_weather_response(response)
+  end
+
+  def format_weather_response(response)
+    body = JSON.parse(response.body, symbolize_names: true)
+
+    OpenStruct.new({
+      current_weather: parse_current_weather(body),
+      daily_weather: parse_daily_weather(body, 5),
+      hourly_weather: parse_hourly_weather(body, 8)
+    })
+  end
+
+  def parse_current_weather(body)
+    {
+      datetime: beautify_datetime(''),
+      sunrise: beautify_datetime(''),
+      sunset: '',
+      temperature: 0.0,
+      feels_like: 0.0,
+      humidity: 0.0,
+      uvi: 0.0,
+      visibility: 0,
+      conditions: '',
+      icon: ''
+    }
+  end
+
+  def parse_daily_weather(body, days)
+    []
+  end
+
+  def parse_hourly_weather(body, hours)
+    []
+  end
+
+  def beautify_datetime(datetime)
+    'TODO'
+  end
   # END WeatherService
 
   # BEGIN MapService
@@ -51,7 +97,6 @@ class Api::V1::ForecastController < ApplicationController
 
   def format_map_response(response)
     body = JSON.parse(response.body, symbolize_names: true)
-    # result = body[:results].first
     geocoords = body[:results].first[:locations].first[:latLng]
 
     OpenStruct.new({

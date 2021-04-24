@@ -11,6 +11,16 @@ RSpec.describe 'Forecast' do
       current_weather = body[:data][:attributes][:current_weather]
 
       expect(current_weather.keys).to eq(current_weather_keys)
+      expect(current_weather[:datetime]).to eq('2020-09-30 13:27:03 -0600')
+      expect(current_weather[:sunrise]).to eq('2020-09-30 06:27:03 -0600')
+      expect(current_weather[:sunset]).to eq('2020-09-30 18:27:03 -0600')
+      expect(current_weather[:temperature]).to eq(45.43)
+      expect(current_weather[:feels_like]).to eq(40.01)
+      expect(current_weather[:humidity]).to eq(20.1)
+      expect(current_weather[:uvi]).to eq(5.37)
+      expect(current_weather[:visibility]).to eq(10000)
+      expect(current_weather[:conditions]).to eq('broken clouds')
+      expect(current_weather[:icon]).to eq('04d')
     end
   end
 
