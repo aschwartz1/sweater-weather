@@ -212,6 +212,8 @@ GEM
     simplecov-html (0.12.3)
     simplecov_json_formatter (0.1.2)
     spring (2.1.1)
+    spring-commands-rspec (1.0.4)
+      spring (>= 0.9.1)
     spring-watcher-listen (2.0.1)
       listen (>= 2.7, < 4.0)
       spring (>= 1.2, < 3.0)
@@ -275,7 +277,7 @@ DEPENDENCIES
   sass-rails (~> 5.0)
   shoulda-matchers (~> 3.1)
   simplecov
-  spring
+  spring-commands-rspec
   spring-watcher-listen (~> 2.0.0)
   travis
   tzinfo-data (>= 1.2016.7)
