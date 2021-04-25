@@ -1,15 +1,13 @@
-class Api::V1::ForecastController < ApplicationController
+class Api::V1::ForecastsController < ApplicationController
   before_action :validate_params
 
   def show
     geocords = fetch_geocoords(params[:location])
 
-    current_weather = fetch_current_weather(geocords)
-    current_weather[:id] = nil
+    weather_data = fetch_weather_data(geocords)
+    weather_data.id = nil
 
-    complete_response = OpenStruct.new(current_weather)
-
-    render json: ForecastSerializer.new(complete_response)
+    render json: ForecastSerializer.new(weather_data)
   end
 
   private
@@ -32,7 +30,7 @@ class Api::V1::ForecastController < ApplicationController
     end
   end
 
-  def fetch_current_weather(geocoords)
+  def fetch_weather_data(geocoords)
     response = weather_connection.get('onecall') do |req|
       req.params[:lat] = geocoords.latitude
       req.params[:lon] = geocoords.longitude
