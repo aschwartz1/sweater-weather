@@ -7,28 +7,54 @@ RSpec.describe User, type: :model do
     it { should have_secure_password }
   end
 
-  describe 'email validations' do
-    it 'converts to lowercase before saving' do
-      User.create(email: 'FOO@bar.COM', password: '1234')
+  describe 'saving' do
+    describe 'email' do
+      it 'converts to lowercase before saving' do
+        User.create(email: 'FOO@bar.COM', password: '1234')
 
-      expect(User.first.email).to eq('foo@bar.com')
+        expect(User.first.email).to eq('foo@bar.com')
+      end
+
+      it 'rejects invalid email formats' do
+        User.create(email: 'poop emoji', password: '1234')
+        expect(User.count).to eq(0)
+
+        User.create(email: 'bob@example', password: '1234')
+        expect(User.count).to eq(0)
+
+        User.create(email: '@example.com', password: '1234')
+        expect(User.count).to eq(0)
+
+        User.create(email: ' @example.com', password: '1234')
+        expect(User.count).to eq(0)
+
+        User.create(email: '" "@example.com', password: '1234')
+        expect(User.count).to eq(0)
+      end
     end
 
-    it 'rejects invalid email formats' do
-      User.create(email: 'poop emoji', password: '1234')
-      expect(User.count).to eq(0)
+    describe 'api_key' do
+      after :each do
+        allow(SecureRandom).to receive(:hex).and_call_original
+      end
 
-      User.create(email: 'bob@example', password: '1234')
-      expect(User.count).to eq(0)
+      it 'creates api key before saving' do
+        user = create(:user)
+        expect(user.api_key.to_s).to_not be_empty
+      end
 
-      User.create(email: '@example.com', password: '1234')
-      expect(User.count).to eq(0)
+      it 'api key must be unique' do
+        user1 = create(:user)
 
-      User.create(email: ' @example.com', password: '1234')
-      expect(User.count).to eq(0)
+        allow(SecureRandom).to receive(:hex).and_return(user1.api_key)
 
-      User.create(email: '" "@example.com', password: '1234')
-      expect(User.count).to eq(0)
+        user2 = User.create(email: 'foo@example.com',
+                              api_key: user1.api_key,
+                              # password: 'password',
+                              password_confirmation: 'xpassword')
+
+        expect(user2.errors.messages).to_not be_empty
+      end
     end
   end
 end
