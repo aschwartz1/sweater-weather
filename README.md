@@ -6,6 +6,7 @@ The Back End API portion of a proposed SOA application to plan road trips. This 
 # Contents
 1. [Endpoints](#endpoints)
     - [Weather Data for a City](#weather-data-for-a-city)
+    - [Background Image for a City](#background-image-for-a-city)
 
 # Endpoints
 ## Weather Data for a City
@@ -78,6 +79,56 @@ The Back End API portion of a proposed SOA application to plan road trips. This 
 >        },
 >        ...
 >      ]
+>    }
+>  }
+>}
+>```
+
+
+## Background Image for a City
+- Note
+  - The background image may not correspond exactly to a city, as it is dependent upon what results come back from [Unsplash](https://unsplash.com?utm_source=sweater_weather&utm_medium=referral).
+- Parameters
+  - `location` **required**
+  - format: `<city>,<2 letter state code>`
+- General Response Info
+  - Returns top-level `data` element with main payload nested in `attributes`
+  - `attributes`
+    - `image` - hash containing image info, including `urls`. See below for exact keys.
+    - `credit` - hash containing credit info for author and [Unsplash](https://unsplash.com?utm_source=sweater_weather&utm_medium=referral)
+
+>```
+> GET /api/v1/forecast?location=denver,co
+> Content-Type: application/json
+> Accept: application/json
+>```
+>```json
+>{
+>  "data": {
+>    "id": nil,
+>    "type": "image",
+>    "attributes": {
+>      "image": {
+>        "width": 444,
+>        "height": 222,
+>        "urls": {
+>          "raw": "https://unsplash.com/photo/path?utm_source=sweater_weather&utm_medium=referral",
+>          "full": "https://unsplash.com/photo/path?utm_source=sweater_weather&utm_medium=referral",
+>          "regular": "https://unsplash.com/photo/path?utm_source=sweater_weather&utm_medium=referral",
+>          "small": "https://unsplash.com/photo/path?utm_source=sweater_weather&utm_medium=referral",
+>          "thumb": "https://unsplash.com/photo/path?utm_source=sweater_weather&utm_medium=referral"
+>        }
+>      },
+>      "credit": {
+>        "author": {
+>          "name": "Bob Trufont",
+>          "url": "https://unsplash.com/@bobtrufont?utm_source=sweater_weather&utm_medium=referral"
+>        },
+>        "host": {
+>          "name": "Unsplash",
+>          "url": "https://unsplash.com?utm_source=sweater_weather&utm_medium=referral"
+>        }
+>      }
 >    }
 >  }
 >}
