@@ -25,7 +25,7 @@ class Api::V1::BackgroundsController < ApplicationController
   def background_connection
     @background_connection ||= Faraday.new 'https://api.unsplash.com' do |conn|
       conn.headers['Accept-Version'] = 'v1'
-      conn.headers['Authorization'] = "#{ENV['unsplash_key']}"
+      conn.headers['Authorization'] = ENV['unsplash_key']
     end
   end
 
@@ -46,7 +46,7 @@ class Api::V1::BackgroundsController < ApplicationController
 
     OpenStruct.new({
       image: parse_image_info(image_result),
-      credit: parse_credit_info(image_result),
+      credit: parse_credit_info(image_result)
     })
   end
 
@@ -54,13 +54,17 @@ class Api::V1::BackgroundsController < ApplicationController
     {
       width: image_result[:width],
       height: image_result[:height],
-      urls: {
-        raw: "#{image_result[:urls][:raw]}&#{unsplash_utm_params}",
-        full: "#{image_result[:urls][:full]}&#{unsplash_utm_params}",
-        regular: "#{image_result[:urls][:regular]}&#{unsplash_utm_params}",
-        small: "#{image_result[:urls][:small]}&#{unsplash_utm_params}",
-        thumb: "#{image_result[:urls][:thumb]}&#{unsplash_utm_params}"
-      }
+      urls: parse_urls(image_result[:urls])
+    }
+  end
+
+  def parse_urls(urls)
+    {
+      raw: "#{urls[:raw]}&#{unsplash_utm_params}",
+      full: "#{urls[:full]}&#{unsplash_utm_params}",
+      regular: "#{urls[:regular]}&#{unsplash_utm_params}",
+      small: "#{urls[:small]}&#{unsplash_utm_params}",
+      thumb: "#{urls[:thumb]}&#{unsplash_utm_params}"
     }
   end
 
