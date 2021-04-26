@@ -37,14 +37,18 @@ class Api::V1::SalariesController < ApplicationController
     salaries.map do |salary|
       {
         title: salary[:job][:title],
-        min: 'min', # salary[:salary_percentiles][:percentile_25],
-        max: 'max' # salary[:salary_percentiles][:percentile_75]
+        min: format_salary(salary[:salary_percentiles][:percentile_25]),
+        max: format_salary(salary[:salary_percentiles][:percentile_75])
       } if pluck_titles.include? salary[:job][:title]
     end.compact
   end
 
   def salary_connection
     @salary_connection ||= Faraday.new 'https://api.teleport.org/api'
+  end
+
+  def format_salary(salary)
+    ActiveSupport::NumberHelper.number_to_currency(salary)
   end
 
   def sorted_job_titles

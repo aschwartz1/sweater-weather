@@ -76,7 +76,19 @@ RSpec.describe 'Sessions Create', type: :request do
       expect(sorted_actual_job_titles).to eq(sorted_expected_job_titles)
     end
 
-    xit 'do I have to check each job for its info?' do
+    it 'each salary min & max contains... something?' do
+      get api_v1_salaries_path(destination: 'dallas')
+
+      expect(response).to be_successful
+      body = JSON.parse(response.body, symbolize_names: true)
+      salaries = body[:data][:attributes][:salaries]
+
+      mins = salaries.map { |salary| salary[:min] }
+      maxes = salaries.map { |salary| salary[:max] }
+
+      # Honestly not sure how to test the numbers are there. Don't want to figure out a regex for it...
+      expect(mins.all? { |str| str.present? }).to eq(true)
+      expect(maxes.all? { |str| str.present? }).to eq(true)
     end
   end
 
