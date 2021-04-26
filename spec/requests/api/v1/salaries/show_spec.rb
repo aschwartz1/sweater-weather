@@ -12,8 +12,8 @@ RSpec.describe 'Sessions Create', type: :request do
       data = body[:data]
 
       expect(data.keys).to eq([:id, :type, :attributes])
-      expect(data[:type]).to eq('users')
-      expect(data[:id]).to be_a(String)
+      expect(data[:type]).to eq('salaries')
+      expect(data[:id]).to be_nil
       expect(data[:attributes].keys).to eq([:destination, :forecast, :salaries])
 
       attributes = data[:attributes]

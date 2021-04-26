@@ -4,14 +4,16 @@ class Api::V1::SalariesController < ApplicationController
     geocords = fetch_geocoords(destination)
     weather_data = fetch_weather_data(geocords)
     salary_data = fetch_salary_data(destination)
-
     combined = combine_data(destination, weather_data, salary_data)
+
+    render json: SalariesSerializer.new(combined)
   end
 
   private
 
   def combine_data(location, weather, salaries)
     OpenStruct.new({
+      id: nil,
       destination: location,
       forecast: weather.to_h,
       salaries: salaries
@@ -92,9 +94,7 @@ class Api::V1::SalariesController < ApplicationController
   def format_weather_response(response)
     body = JSON.parse(response.body, symbolize_names: true)
 
-    OpenStruct.new({
-      forecast: parse_forecast(body),
-    })
+    OpenStruct.new(parse_forecast(body))
   end
 
   def parse_forecast(body)
