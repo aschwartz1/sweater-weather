@@ -3,7 +3,13 @@ class Api::V1::UsersController < ApplicationController
   before_action :validate_params_exist
 
   def create
-    body = JSON.parse(request.body.read)
+    user = User.new(user_params)
+
+    if user.save
+      render json: UsersSerializer.new(user), status: :created
+    elsif
+      # render json: ErrorSerializer.new(user.errors.messages), status: :unprocessable_entity
+    end
   end
 
   private

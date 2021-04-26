@@ -2,32 +2,51 @@ require 'rails_helper'
 
 RSpec.describe 'User Create', type: :request do
   describe 'Happy Path' do
-    it 'is correct' do
-      get api_v1_backgrounds_path(location: 'denver,co')
+    it 'returns correct structure' do
+      headers = {'Content-Type' => 'application/json'}
+      body = {
+        'email': 'me@example.com',
+        'password': 'foobar',
+        'password_confirmation': 'foobar'
+      }
 
-      expect(response).to be_successful
+      post api_v1_users_path, headers: headers, params: body, as: :json
+
+      expect(response).to have_http_status(201)
       body = JSON.parse(response.body, symbolize_names: true)
 
-      image = body[:data][:attributes][:image]
-      expect(image[:width]).to eq(5100)
-      expect(image[:height]).to eq(3400)
+      expect(body.keys).to eq([:data])
+      data = body[:data]
 
-      urls = image[:urls]
-      expect(urls[:raw]).to eq('https://images.unsplash.com/photo-1602800458591-eddda28a498b?ixid=MnwyMjU5MjJ8MHwxfHNlYXJjaHwzfHxkZW52ZXIlMjBza3lsaW5lfGVufDB8fHx8MTYxOTMxNTkwMg&ixlib=rb-1.2.1&utm_source=sweater_weather&utm_medium=referral')
-      expect(urls[:full]).to eq('https://images.unsplash.com/photo-1602800458591-eddda28a498b?crop=entropy&cs=srgb&fm=jpg&ixid=MnwyMjU5MjJ8MHwxfHNlYXJjaHwzfHxkZW52ZXIlMjBza3lsaW5lfGVufDB8fHx8MTYxOTMxNTkwMg&ixlib=rb-1.2.1&q=85&utm_source=sweater_weather&utm_medium=referral')
-      expect(urls[:regular]).to eq('https://images.unsplash.com/photo-1602800458591-eddda28a498b?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=MnwyMjU5MjJ8MHwxfHNlYXJjaHwzfHxkZW52ZXIlMjBza3lsaW5lfGVufDB8fHx8MTYxOTMxNTkwMg&ixlib=rb-1.2.1&q=80&w=1080&utm_source=sweater_weather&utm_medium=referral')
-      expect(urls[:small]).to eq('https://images.unsplash.com/photo-1602800458591-eddda28a498b?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=MnwyMjU5MjJ8MHwxfHNlYXJjaHwzfHxkZW52ZXIlMjBza3lsaW5lfGVufDB8fHx8MTYxOTMxNTkwMg&ixlib=rb-1.2.1&q=80&w=400&utm_source=sweater_weather&utm_medium=referral')
-      expect(urls[:thumb]).to eq('https://images.unsplash.com/photo-1602800458591-eddda28a498b?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=MnwyMjU5MjJ8MHwxfHNlYXJjaHwzfHxkZW52ZXIlMjBza3lsaW5lfGVufDB8fHx8MTYxOTMxNTkwMg&ixlib=rb-1.2.1&q=80&w=200&utm_source=sweater_weather&utm_medium=referral')
+      expect(data.keys).to eq([:id, :type, :attributes])
+      expect(data[:type]).to eq('users')
+      expect(data[:id]).to be_a(String)
+      expect(data[:attributes].keys).to eq([:email, :api_key])
+      attributes = data[:attributes]
 
-      credit = body[:data][:attributes][:credit]
-      author = credit[:author]
-      expect(author.keys).to eq([:name, :url])
-      expect(author[:name]).to eq('Andrew Coop')
-      expect(author[:url]).to eq('https://unsplash.com/@andrewcoop?utm_source=sweater_weather&utm_medium=referral')
+      expect(attributes[:email]).to be_a(String)
+      expect(attributes[:api_key]).to be_a(String)
+    end
 
-      host = credit[:host]
-      expect(host[:name]).to eq('Unsplash')
-      expect(host[:url]).to eq('https://unsplash.com?utm_source=sweater_weather&utm_medium=referral')
+    it 'creates a user and gives them an api key' do
+      headers = {'Content-Type' => 'application/json'}
+      body = {
+        'email': 'me@example.com',
+        'password': 'foobar',
+        'password_confirmation': 'foobar'
+      }
+
+      post api_v1_users_path, headers: headers, params: body, as: :json
+      created_user = User.last
+
+      expect(response).to have_http_status(201)
+      body = JSON.parse(response.body, symbolize_names: true)
+      data = body[:data]
+      attributes = data[:attributes]
+
+      expect(data[:id]).to eq(created_user.id.to_s)
+      expect(attributes[:email]).to eq(created_user.email)
+      expect(attributes[:api_key]).to eq(created_user.api_key)
     end
   end
 
@@ -41,10 +60,7 @@ RSpec.describe 'User Create', type: :request do
     end
 
     it 'returns error if required body params are not sent' do
-      headers = {
-        'Content-Type' => 'application/json'
-      }
-
+      headers = {'Content-Type' => 'application/json'}
       body = {
         'email': 'me@example.com',
         'password': 'foobar'
