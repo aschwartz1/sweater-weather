@@ -1,14 +1,6 @@
 require 'rails_helper'
 
 RSpec.describe 'Sessions Create', type: :request do
-  before :all do
-    VCR.turn_off!
-  end
-
-  after :all do
-    VCR.turn_on!
-  end
-
   describe 'Happy Path' do
     it 'returns correct structure' do
       get api_v1_salaries_path(destination: 'dallas')
