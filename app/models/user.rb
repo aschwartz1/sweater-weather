@@ -12,6 +12,14 @@ class User < ApplicationRecord
 
   has_secure_password
 
+  def self.find_and_authenticate(credentials)
+    user = find_by(email: credentials[:email])
+    return nil if user.nil?
+    return nil unless user.authenticate(credentials[:password])
+
+    user
+  end
+
   private
 
   def normalize_email
