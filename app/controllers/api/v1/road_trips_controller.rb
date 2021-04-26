@@ -3,19 +3,34 @@ class Api::V1::RoadTripsController < ApplicationController
   before_action :validate_params_exist
 
   def create
-    user = User.find_and_authenticate(credential_params)
-
-    if user.present?
-      render json: UsersSerializer.new(user)
+    if User.valid_api_key?(road_trip_params[:api_key])
+      trip = fetch_road_trip(road_trip_params[:origin], road_trip_params[:destination])
+      render json: RoadTripSerializer.new(trip)
     else
-      render json: errors_serializer(['Invalid credentials']), status: :unauthorized
+      render json: errors_serializer(['Invalid api key']), status: :unauthorized
     end
   end
 
   private
 
-  def credential_params
-    @credential_params ||= parse_params
+  def fetch_road_trip(origin, destination)
+    format_road_trip('placeholder')
+  end
+
+  def format_road_trip(args)
+    weather_data = {temperature: 60.1, conditions: 'conditions'}
+
+    OpenStruct.new({
+      id: nil,
+      start_city: 'start',
+      end_city: 'end',
+      travel_time: 'travel time',
+      weather_at_eta: weather_data
+    })
+  end
+
+  def road_trip_params
+    @road_trip_params ||= parse_params
   end
 
   def parse_params
@@ -29,10 +44,10 @@ class Api::V1::RoadTripsController < ApplicationController
   end
 
   def all_params_exist?
-    expected = %i[email password]
+    expected = %i[origin destination api_key]
 
     expected.all? do |param|
-      credential_params.include?(param)
+      road_trip_params.include?(param)
     end
   end
 

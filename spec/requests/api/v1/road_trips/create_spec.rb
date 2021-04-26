@@ -9,8 +9,9 @@ RSpec.describe 'Road Trips Create', type: :request do
   describe 'Happy Path' do
     before :each do
       @body = {
-        'email': 'test@example.com',
-        'password': 'password'
+        'origin': 'Denver,CO',
+        'destination': 'Pueblo,CO',
+        'api_key': @user.api_key,
       }
     end
 
@@ -24,8 +25,8 @@ RSpec.describe 'Road Trips Create', type: :request do
       data = body[:data]
 
       expect(data.keys).to eq([:id, :type, :attributes])
+      expect(data[:id]).to be_nil
       expect(data[:type]).to eq('roadtrip')
-      expect(data[:id]).to be_a(String)
       expect(data[:attributes].keys).to eq([:start_city, :end_city, :travel_time, :weather_at_eta])
       attributes = data[:attributes]
 
@@ -35,8 +36,8 @@ RSpec.describe 'Road Trips Create', type: :request do
       expect(attributes[:weather_at_eta].keys).to eq([:temperature, :conditions])
       weather = attributes[:weather_at_eta]
 
-      expect(weather[:temperature]). be_a(Float)
-      expect(weather[:conditions]). be_a(String)
+      expect(weather[:temperature]).to be_a(Float)
+      expect(weather[:conditions]).to be_a(String)
     end
 
     xit 'returns users data, excluding password' do
@@ -54,10 +55,11 @@ RSpec.describe 'Road Trips Create', type: :request do
   end
 
   describe 'sad path' do
-    xit 'returns error with general message if password is invalid' do
+    it 'returns unauthenticated error if api_key is invalid' do
       body = {
-        'email': 'test@example.com',
-        'password': 'thisisnotit',
+        'origin': 'Denver,CO',
+        'destination': 'Pueblo,CO',
+        'api_key': 'invalid',
       }
 
       post api_v1_road_trips_path, headers: @headers, params: body, as: :json
@@ -74,34 +76,11 @@ RSpec.describe 'Road Trips Create', type: :request do
 
       attributes = first[:attributes]
       expect(attributes.keys).to eq([:message])
-      expect(attributes[:message]).to eq("Invalid credentials")
+      expect(attributes[:message]).to eq("Invalid api key")
     end
 
-    xit 'returns error with general message if password is invalid' do
-      body = {
-        'email': 'poop emoji',
-        'password': 'password',
-      }
-
-      post api_v1_road_trips_path, headers: @headers, params: body, as: :json
-
-      expect(response).to have_http_status(401)
-      body = JSON.parse(response.body, symbolize_names: true)
-
-      data = body[:data]
-      expect(data).to be_an(Array)
-      expect(data.size).to eq(1)
-
-      first = data.first
-      expect(first.keys).to eq([:id, :type, :attributes])
-
-      attributes = first[:attributes]
-      expect(attributes.keys).to eq([:message])
-      expect(attributes[:message]).to eq("Invalid credentials")
-    end
-
-    xit 'returns error if required body params are not sent' do
-      post api_v1_road_trips_path, headers: @headers, params: body, as: :json
+    it 'returns error if required body params are not sent' do
+      post api_v1_road_trips_path, headers: @headers, as: :json
       expect(response).to have_http_status(400)
     end
   end
