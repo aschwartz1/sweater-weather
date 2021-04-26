@@ -7,12 +7,21 @@ class Api::V1::UsersController < ApplicationController
 
     if user.save
       render json: UsersSerializer.new(user), status: :created
-    elsif
-      # render json: ErrorSerializer.new(user.errors.messages), status: :unprocessable_entity
+    else
+      render json: ErrorsSerializer.new(ostructify_errors(user.errors.full_messages)), status: :unprocessable_entity
     end
   end
 
   private
+
+  def ostructify_errors(error_messages)
+    error_messages.map do |message|
+      OpenStruct.new({
+        id: nil,
+        message: message
+      })
+    end
+  end
 
   def user_params
     @user_params ||= parse_params

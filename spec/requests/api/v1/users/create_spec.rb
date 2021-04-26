@@ -51,12 +51,54 @@ RSpec.describe 'User Create', type: :request do
   end
 
   describe 'sad path' do
-    xit 'returns error if passwords do not match' do
-      # TODO: handled when trying to save a record
+    it 'returns error if passwords do not match' do
+      headers = {'Content-Type' => 'application/json'}
+      body = {
+        'email': 'me@example.com',
+        'password': 'foobar',
+        'password_confirmation': 'barfoo'
+      }
+
+      post api_v1_users_path, headers: headers, params: body, as: :json
+
+      expect(response).to have_http_status(422)
+      body = JSON.parse(response.body, symbolize_names: true)
+
+      data = body[:data]
+      expect(data).to be_an(Array)
+      expect(data.size).to eq(1)
+
+      first = data.first
+      expect(first.keys).to eq([:id, :type, :attributes])
+
+      attributes = first[:attributes]
+      expect(attributes.keys).to eq([:message])
+      expect(attributes[:message]).to eq("Password confirmation doesn't match Password")
     end
 
-    xit 'returns error if email is invalid' do
-      # TODO: handled when trying to save a record
+    it 'returns error if email is invalid' do
+      headers = {'Content-Type' => 'application/json'}
+      body = {
+        'email': 'poop emoji',
+        'password': 'foobar',
+        'password_confirmation': 'foobar'
+      }
+
+      post api_v1_users_path, headers: headers, params: body, as: :json
+
+      expect(response).to have_http_status(422)
+      body = JSON.parse(response.body, symbolize_names: true)
+
+      data = body[:data]
+      expect(data).to be_an(Array)
+      expect(data.size).to eq(1)
+
+      first = data.first
+      expect(first.keys).to eq([:id, :type, :attributes])
+
+      attributes = first[:attributes]
+      expect(attributes.keys).to eq([:message])
+      expect(attributes[:message]).to eq("Email is invalid")
     end
 
     it 'returns error if required body params are not sent' do
