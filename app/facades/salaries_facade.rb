@@ -1,27 +1,15 @@
-class Api::V1::SalariesController < ApplicationController
-  before_action :validate_params
-
-  def show
-    # TODO: OUT OF TIME. Started to pull into facade but controller can't find my file?
-    # combined = SalariesFacade.fetch_salaries_for(params[:destination])
-
+class SalariesFacade
+  def self.fetch_salaries_for(destination)
     destination = params[:destination]
     geocords = fetch_geocoords(destination)
     weather_data = fetch_weather_data(geocords)
     salary_data = fetch_salary_data(destination)
     combined = combine_data(destination, weather_data, salary_data)
-
-    render json: SalariesSerializer.new(combined)
   end
 
   private
 
-  def validate_params
-    # Desired format like `denver,co`
-    render json: '', status: :bad_request and return if params[:destination].blank?
-  end
-
-  def combine_data(location, weather, salaries)
+  def self.combine_data(location, weather, salaries)
     OpenStruct.new({
       id: nil,
       destination: location,
@@ -31,19 +19,19 @@ class Api::V1::SalariesController < ApplicationController
   end
 
   # BEGIN SalaryService
-  def fetch_salary_data(destination)
+  def self.fetch_salary_data(destination)
     response = salary_connection.get("urban_areas/slug:#{destination}/salaries")
     format_salary_response(response)
   end
 
-  def format_salary_response(response)
+  def self.format_salary_response(response)
     body = JSON.parse(response.body, symbolize_names: true)
     salaries = body[:salaries]
 
     format_salaries(sorted_job_titles, salaries)
   end
 
-  def format_salaries(pluck_titles, salaries)
+  def self.format_salaries(pluck_titles, salaries)
     salaries.map do |salary|
       {
         title: salary[:job][:title],
@@ -53,15 +41,15 @@ class Api::V1::SalariesController < ApplicationController
     end.compact
   end
 
-  def salary_connection
+  def self.salary_connection
     @salary_connection ||= Faraday.new 'https://api.teleport.org/api'
   end
 
-  def format_salary(salary)
+  def self.format_salary(salary)
     ActiveSupport::NumberHelper.number_to_currency(salary)
   end
 
-  def sorted_job_titles
+  def self.sorted_job_titles
     [
       'Data Analyst',
       'Data Scientist',
@@ -75,13 +63,13 @@ class Api::V1::SalariesController < ApplicationController
   # END SalaryService
 
   # BEGIN MapService
-  def map_connection
+  def self.map_connection
     @map_connection ||= Faraday.new 'http://www.mapquestapi.com/geocoding/v1' do |conn|
       conn.params[:key] = ENV['mapquest_key']
     end
   end
 
-  def fetch_geocoords(location)
+  def self.fetch_geocoords(location)
     response = map_connection.get('address') do |req|
       req.params[:location] = location
     end
@@ -89,7 +77,7 @@ class Api::V1::SalariesController < ApplicationController
     format_map_response(response)
   end
 
-  def format_map_response(response)
+  def self.format_map_response(response)
     body = JSON.parse(response.body, symbolize_names: true)
     geocoords = body[:results].first[:locations].first[:latLng]
 
@@ -101,13 +89,13 @@ class Api::V1::SalariesController < ApplicationController
   # END MapService
 
   # BEGIN WeatherService
-  def weather_connection
+  def self.weather_connection
     @weather_connection ||= Faraday.new 'https://api.openweathermap.org/data/2.5' do |conn|
       conn.params[:appid] = ENV['openweather_key']
     end
   end
 
-  def fetch_weather_data(geocoords)
+  def self.fetch_weather_data(geocoords)
     response = weather_connection.get('onecall') do |req|
       req.params[:lat] = geocoords.latitude
       req.params[:lon] = geocoords.longitude
@@ -118,13 +106,13 @@ class Api::V1::SalariesController < ApplicationController
     format_weather_response(response)
   end
 
-  def format_weather_response(response)
+  def self.format_weather_response(response)
     body = JSON.parse(response.body, symbolize_names: true)
 
     OpenStruct.new(parse_forecast(body))
   end
 
-  def parse_forecast(body)
+  def self.parse_forecast(body)
     current = body[:current]
     {
       summary: current[:weather].first[:description],
@@ -132,7 +120,7 @@ class Api::V1::SalariesController < ApplicationController
     }
   end
 
-  def display_temp(temperature)
+  def self.display_temp(temperature)
     "#{temperature.to_i} F"
   end
   # END WeatherService
