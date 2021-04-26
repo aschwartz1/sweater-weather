@@ -22,28 +22,41 @@ class Api::V1::SalariesController < ApplicationController
 
   # BEGIN SalaryService
   def fetch_salary_data(destination)
-    # response = salary_connection.get("urban_areas/slug:#{location}/salaries")
-    format_salary_response('placeholder')
+    response = salary_connection.get("urban_areas/slug:#{destination}/salaries")
+    format_salary_response(response)
   end
 
   def format_salary_response(response)
-    # body = JSON.parse(response.body, symbolize_names: true)
-    # salaries = body[:salaries]
-    extract_salaries('salaries')
+    body = JSON.parse(response.body, symbolize_names: true)
+    salaries = body[:salaries]
+
+    format_salaries(sorted_job_titles, salaries)
   end
 
-  def extract_salaries(placeholder)
-    7.times.map do
+  def format_salaries(pluck_titles, salaries)
+    salaries.map do |salary|
       {
-        title: 'title',
-        min: 'min',
-        max: 'max'
-      }
-    end
+        title: salary[:job][:title],
+        min: 'min', # salary[:salary_percentiles][:percentile_25],
+        max: 'max' # salary[:salary_percentiles][:percentile_75]
+      } if pluck_titles.include? salary[:job][:title]
+    end.compact
   end
 
   def salary_connection
     @salary_connection ||= Faraday.new 'https://api.teleport.org/api'
+  end
+
+  def sorted_job_titles
+    [
+      'Data Analyst',
+      'Data Scientist',
+      'Mobile Developer',
+      'QA Engineer',
+      'Software Engineer',
+      'Systems Administrator',
+      'Web Developer'
+    ]
   end
   # END SalaryService
 
