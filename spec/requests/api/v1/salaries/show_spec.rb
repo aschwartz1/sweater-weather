@@ -44,7 +44,15 @@ RSpec.describe 'Sessions Create', type: :request do
       expect(last[:max]).to be_a(String)
     end
 
-    xit 'returns weather info' do
+    it 'returns weather info' do
+      get api_v1_salaries_path(destination: 'dallas')
+
+      expect(response).to be_successful
+      body = JSON.parse(response.body, symbolize_names: true)
+      forecast = body[:data][:attributes][:forecast]
+
+      expect(forecast[:summary]).to be_a(String)
+      expect(forecast[:temperature]).to match(/-?\d{1,3} F/)
     end
 
     xit 'returns each job title we want' do
