@@ -66,6 +66,14 @@ RSpec.describe 'Sessions Create', type: :request do
     end
 
     it 'returns each job title we want' do
+      get api_v1_salaries_path(destination: 'dallas')
+
+      expect(response).to be_successful
+      body = JSON.parse(response.body, symbolize_names: true)
+      salaries = body[:data][:attributes][:salaries]
+
+      sorted_actual_job_titles = salaries.map { |salary| salary[:title] }.sort
+      expect(sorted_actual_job_titles).to eq(sorted_expected_job_titles)
     end
 
     xit 'do I have to check each job for its info?' do
@@ -75,5 +83,17 @@ RSpec.describe 'Sessions Create', type: :request do
   describe 'sad path' do
     xit 'returns 400 if query parameter is not present' do
     end
+  end
+
+  def sorted_expected_job_titles
+    [
+      'Data Analyst',
+      'Data Scientist',
+      'Mobile Developer',
+      'QA Engineer',
+      'Software Engineer',
+      'Systems Administrator',
+      'Web Developer'
+    ]
   end
 end
