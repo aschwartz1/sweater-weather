@@ -20,15 +20,16 @@ class Api::V1::UsersController < ApplicationController
 
   def parse_params
     return {} if request.body.read.blank?
+
     JSON.parse(request.body.read, symbolize_names: true)
   end
 
   def validate_params_exist
-    render json: errors_serializer(['No params found in request body']), status: :bad_request and return unless all_params_exist?
+    render json: errors_serializer(['No params found in request body']), status: :bad_request unless all_params_exist?
   end
 
   def all_params_exist?
-    expected = %i{email password password_confirmation}
+    expected = %i[email password password_confirmation]
 
     expected.all? do |param|
       user_params.include?(param)
