@@ -1,4 +1,6 @@
 class Api::V1::SalariesController < ApplicationController
+  before_action :validate_params
+
   def show
     destination = params[:destination]
     geocords = fetch_geocoords(destination)
@@ -10,6 +12,11 @@ class Api::V1::SalariesController < ApplicationController
   end
 
   private
+
+  def validate_params
+    # Desired format like `denver,co`
+    render json: '', status: :bad_request and return if params[:destination].blank?
+  end
 
   def combine_data(location, weather, salaries)
     OpenStruct.new({

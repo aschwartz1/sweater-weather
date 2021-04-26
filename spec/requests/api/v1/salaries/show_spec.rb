@@ -93,7 +93,10 @@ RSpec.describe 'Sessions Create', type: :request do
   end
 
   describe 'sad path' do
-    xit 'returns 400 if query parameter is not present' do
+    it 'returns 400 if query parameter is not present' do
+      get api_v1_salaries_path
+
+      expect(response).to have_http_status(400)
     end
   end
 
