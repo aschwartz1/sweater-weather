@@ -3,10 +3,7 @@ require 'rails_helper'
 RSpec.describe 'Backgrounds' do
   describe 'General Structure' do
     it 'is correct' do
-      VCR.turn_off!
-      WebMock.allow_net_connect!
-
-      # VCR.use_cassette('denver_background_request') do
+      VCR.use_cassette('denver_background_request') do
         get api_v1_backgrounds_path(location: 'denver,co')
 
         expect(response).to be_successful
@@ -35,7 +32,7 @@ RSpec.describe 'Backgrounds' do
         host = credit[:host]
         expect(host.keys).to eq([:name, :url])
       end
-    # end
+    end
   end
 
   describe 'sad path' do
@@ -59,8 +56,6 @@ end
     image: {
       width: 444,
       height: 222,
-      location: 'denver, co',
-      title: 'buildings at midday',
       urls: {
         raw: 'https://unsplash.com/photo/path?utm_source=sweater_weather&utm_medium=referral',
         full: 'https://unsplash.com/photo/path?utm_source=sweater_weather&utm_medium=referral',

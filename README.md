@@ -7,6 +7,7 @@ The Back End API portion of a proposed SOA application to plan road trips. This 
 1. [Endpoints](#endpoints)
     - [Weather Data for a City](#weather-data-for-a-city)
     - [Background Image for a City](#background-image-for-a-city)
+    - [User Creation](#user-creation)
 
 # Endpoints
 ## Weather Data for a City
@@ -131,5 +132,54 @@ The Back End API portion of a proposed SOA application to plan road trips. This 
 >      }
 >    }
 >  }
+>}
+>```
+
+
+## User Creation
+- Body Data
+  - `email` **required**
+  - `password` **required**
+  - `password_confirmation` **required**
+- Success Response Info
+  - `201 Created`
+  - Returns top-level `data` element with main payload nested in `attributes`
+  - `id` will be the id for the created user
+  - `attributes`
+    - `email` - the email sent with the request, normalized to lowercase
+    - `api_key` - a unique api_key for the user
+
+>```json
+>{
+>  "data": {
+>    "id": "1",
+>    "type": "users",
+>    "attributes": {
+>      "email": "foo@example.com",
+>      "api_key": "EXAMPLE_KEY"
+>    }
+>  }
+>}
+>```
+
+- Failure Response Info
+  - Possible error codes:
+    - `400 Bad Request`, if the request sent no body data
+    - `422 Unprocessable Entity`, if any parameter is invalid (including if password & confirmation don't match)
+  - Returns top-level `data` element which will ALWAYS be an array
+    - `id` will be null
+    - `attributes`
+      - `message` - the email sent with the request, normalized to lowercase
+
+>```json
+>{
+>  "data": [{
+>    "id": null,
+>    "type": "users",
+>    "attributes": {
+>      "message": "Email is invalid",
+>    },
+>    ...
+>  }]
 >}
 >```
