@@ -57,4 +57,32 @@ RSpec.describe User, type: :model do
       end
     end
   end
+
+  describe 'class methods' do
+    describe '::find_and_authenticate' do
+      it 'returns user if credentials are correct' do
+        user = create(:user, :test)
+
+        found = User.find_and_authenticate(email: user.email, password: user.password)
+
+        expect(found.id).to eq(user.id)
+      end
+
+      it 'returns nil if no user is found' do
+        user = create(:user, :test)
+
+        found = User.find_and_authenticate(email: 'not_it@example.com', password: user.password)
+
+        expect(found).to be_nil
+      end
+
+      it 'returns nil if credentials are incorrect' do
+        user = create(:user, :test)
+
+        found = User.find_and_authenticate(email: user.email, password: 'not_their_password')
+
+        expect(found).to be_nil
+      end
+    end
+  end
 end
