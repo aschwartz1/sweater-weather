@@ -1,11 +1,49 @@
 class Api::V1::SalariesController < ApplicationController
   def show
-    geocords = fetch_geocoords(params[:destination])
+    destination = params[:destination]
+    geocords = fetch_geocoords(destination)
     weather_data = fetch_weather_data(geocords)
-    salary_data = fetch_salary_data(params[:destination])
+    salary_data = fetch_salary_data(destination)
+
+    combined = combine_data(destination, weather_data, salary_data)
   end
 
   private
+
+  def combine_data(location, weather, salaries)
+    OpenStruct.new({
+      destination: location,
+      forecast: weather.to_h,
+      salaries: salaries
+    })
+  end
+
+  # BEGIN SalaryService
+  def fetch_salary_data(destination)
+    # response = salary_connection.get("urban_areas/slug:#{location}/salaries")
+    format_salary_response('placeholder')
+  end
+
+  def format_salary_response(response)
+    # body = JSON.parse(response.body, symbolize_names: true)
+    # salaries = body[:salaries]
+    extract_salaries('salaries')
+  end
+
+  def extract_salaries(placeholder)
+    7.times.map do
+      {
+        title: 'title',
+        min: 'min',
+        max: 'max'
+      }
+    end
+  end
+
+  def salary_connection
+    @salary_connection ||= Faraday.new 'https://api.teleport.org/api'
+  end
+  # END SalaryService
 
   # BEGIN MapService
   def map_connection
