@@ -8,6 +8,7 @@ The Back End API portion of a proposed SOA application to plan road trips. This 
     - [Weather Data for a City](#weather-data-for-a-city)
     - [Background Image for a City](#background-image-for-a-city)
     - [User Creation](#user-creation)
+    - [User Log In](#user-log-in)
 
 # Endpoints
 ## Weather Data for a City
@@ -135,7 +136,6 @@ The Back End API portion of a proposed SOA application to plan road trips. This 
 >}
 >```
 
-
 ## User Creation
 - Body Data
   - `email` **required**
@@ -149,6 +149,17 @@ The Back End API portion of a proposed SOA application to plan road trips. This 
     - `email` - the email sent with the request, normalized to lowercase
     - `api_key` - a unique api_key for the user
 
+>```
+>POST /api/v1/users
+>Content-Type: application/json
+>Accept: application/json
+>
+>{
+>  "email": "whatever@example.com",
+>  "password": "password",
+>  "password_confirmation": "password"
+>}
+>```
 >```json
 >{
 >  "data": {
@@ -169,7 +180,7 @@ The Back End API portion of a proposed SOA application to plan road trips. This 
   - Returns top-level `data` element which will ALWAYS be an array
     - `id` will be null
     - `attributes`
-      - `message` - the email sent with the request, normalized to lowercase
+      - `message` - A message about the error
 
 >```json
 >{
@@ -180,6 +191,61 @@ The Back End API portion of a proposed SOA application to plan road trips. This 
 >      "message": "Email is invalid",
 >    },
 >    ...
+>  }]
+>}
+>```
+
+## User Log In
+- Body Data
+  - `email` **required**
+  - `password` **required**
+- Success Response Info
+  - `200 OK`
+  - Returns top-level `data` element with main payload nested in `attributes`
+  - `id` will be the id for the created user
+  - `attributes`
+    - `email` - the email sent with the request, normalized to lowercase
+    - `api_key` - a unique api_key for the user
+
+>```
+>POST /api/v1/sessions
+>Content-Type: application/json
+>Accept: application/json
+>
+>{
+>  "email": "whatever@example.com",
+>  "password": "password"
+>}
+>```
+>```json
+>{
+>  "data": {
+>    "id": "1",
+>    "type": "users",
+>    "attributes": {
+>      "email": "foo@example.com",
+>      "api_key": "EXAMPLE_KEY"
+>    }
+>  }
+>}
+>```
+
+- Failure Response Info
+  - Possible error codes:
+    - `400 Bad Request`, if the request sent no body data
+    - `401 Unauthorized`, if any credential is invalid
+  - Returns top-level `data` element which will ALWAYS be an array
+    - `id` will be null
+    - `attributes`
+      - `message` - A message about the error
+
+>```json
+>{
+>  "data": [{
+>    "id": null,
+>    "type": "users",
+>    "attributes": {
+>      "message": "Invalid credentials",
 >  }]
 >}
 >```
