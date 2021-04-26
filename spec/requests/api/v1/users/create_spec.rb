@@ -103,10 +103,6 @@ RSpec.describe 'User Create', type: :request do
 
     it 'returns error if required body params are not sent' do
       headers = {'Content-Type' => 'application/json'}
-      body = {
-        'email': 'me@example.com',
-        'password': 'foobar'
-      }
 
       post api_v1_users_path, headers: headers, params: body, as: :json
       expect(response).to have_http_status(400)
