@@ -50,7 +50,7 @@ RSpec.describe 'Road Trips Create', type: :request do
 
       expect(attributes[:start_city]).to eq('Denver, CO')
       expect(attributes[:end_city]).to eq('Pueblo, CO')
-      expect(attributes[:travel_time]).to eq('1 hour(s), 44 minutes')
+      expect(attributes[:travel_time]).to eq('1 hours, 44 minutes')
     end
   end
 
@@ -82,9 +82,6 @@ RSpec.describe 'Road Trips Create', type: :request do
     it 'returns error if required body params are not sent' do
       post api_v1_road_trip_path, headers: @headers, as: :json
       expect(response).to have_http_status(400)
-    end
-
-    xit 'returns error with message if route is impossible' do
     end
   end
 end
