@@ -49,5 +49,10 @@ RSpec.describe 'Forecast Service' do
         end
       end
     end
+
+    describe 'sad path' do
+      xit 'returns some sort of error if route is impossible' do
+      end
+    end
   end
 end

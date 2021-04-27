@@ -16,7 +16,7 @@ class MapService
     format_directions(response)
   end
 
-  private
+  private_class_method
 
   def self.map_connection
     @map_connection ||= Faraday.new 'http://www.mapquestapi.com' do |conn|
@@ -40,17 +40,17 @@ class MapService
     locations = route[:locations]
 
     OpenStruct.new({
-      from: {
-        name: "#{locations[0][:adminArea5]}, #{route[:locations][0][:adminArea3]}",
-        latitude: locations[0][:latLng][:lat],
-        longitude: locations[0][:latLng][:lng]
-      },
-      to: {
-        name: "#{locations[1][:adminArea5]}, #{route[:locations][1][:adminArea3]}",
-        latitude: locations[1][:latLng][:lat],
-        longitude: locations[1][:latLng][:lng]
-      },
+      from: extract_location_info(locations[0]),
+      to: extract_location_info(locations[1]),
       travel_time: route[:formattedTime]
     })
+  end
+
+  def self.extract_location_info(location)
+    {
+      name: "#{location[:adminArea5]}, #{location[:adminArea3]}",
+      latitude: location[:latLng][:lat],
+      longitude: location[:latLng][:lng]
+    }
   end
 end

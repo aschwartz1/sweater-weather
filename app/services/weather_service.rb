@@ -10,7 +10,7 @@ class WeatherService
     format_weather_response(response)
   end
 
-  private
+  private_class_method
 
   def self.weather_connection
     @weather_connection ||= Faraday.new 'https://api.openweathermap.org/data/2.5' do |conn|
