@@ -1,15 +1,14 @@
 require_relative '../../app/services/weather_service.rb'
-
 require 'rails_helper'
 
 RSpec.describe 'Weather Service' do
   let(:latitude) { 39.738453 }
   let(:longitude) { -104.984853 }
 
-  describe 'Forecast' do
+  describe 'Fetch Forecast' do
     it 'Hourly weather is correct' do
       VCR.use_cassette('denver_weather_request') do
-        result = WeatherService.fetch_forecast(latitude, longitude)
+        result = WeatherService.fetch_forecast(latitude, longitude, num_daily: 5, num_hourly: 8)
 
         hourly_weather = result.hourly_weather
 
@@ -34,7 +33,7 @@ RSpec.describe 'Weather Service' do
 
     it 'Daily weather is correct' do
       VCR.use_cassette('denver_weather_request') do
-        result = WeatherService.fetch_forecast(latitude, longitude)
+        result = WeatherService.fetch_forecast(latitude, longitude, num_daily: 5, num_hourly: 8)
 
         daily_weather = result.daily_weather
 
@@ -65,7 +64,7 @@ RSpec.describe 'Weather Service' do
 
     it 'Current weather is correct' do
       VCR.use_cassette('denver_weather_request') do
-        result = WeatherService.fetch_forecast(latitude, longitude)
+        result = WeatherService.fetch_forecast(latitude, longitude, num_daily: 5, num_hourly: 8)
 
         current_weather = result.current_weather
 
@@ -84,6 +83,76 @@ RSpec.describe 'Weather Service' do
     end
   end
 
+  describe 'Fetch Hourly' do
+    it 'returns correct number and structure' do
+      VCR.use_cassette('denver_weather_request') do
+        result = WeatherService.fetch_hourly(latitude, longitude, num_results: 4)
+
+        expect(result).to be_an(Array)
+        expect(result.size).to eq(4)
+
+        first = result.first
+        expect(first).to respond_to(:time)
+        expect(first).to respond_to(:temperature)
+        expect(first).to respond_to(:conditions)
+        expect(first).to respond_to(:icon)
+        expect(first.time).to eq('14:00:00')
+        expect(first.temperature).to eq(59.74)
+        expect(first.conditions).to eq('overcast clouds')
+        expect(first.icon).to eq('04d')
+
+        last = result.last
+        expect(first).to respond_to(:time)
+        expect(first).to respond_to(:temperature)
+        expect(first).to respond_to(:conditions)
+        expect(first).to respond_to(:icon)
+        expect(last.time).to eq('17:00:00')
+        expect(last.temperature).to eq(64.6)
+        expect(last.conditions).to eq('overcast clouds')
+        expect(last.icon).to eq('04d')
+      end
+    end
+  end
+
+  describe 'Fetch Daily' do
+    it 'returns correct number and structure' do
+      VCR.use_cassette('denver_weather_request') do
+        result = WeatherService.fetch_daily(latitude, longitude, num_results: 2)
+
+        expect(result).to be_an(Array)
+        expect(result.size).to eq(2)
+
+        first = result.first
+        expect(first).to respond_to(:date)
+        expect(first).to respond_to(:sunrise)
+        expect(first).to respond_to(:sunset)
+        expect(first).to respond_to(:max_temp)
+        expect(first).to respond_to(:min_temp)
+        expect(first).to respond_to(:conditions)
+        expect(first).to respond_to(:icon)
+        expect(first.date).to eq('2021-04-25')
+        expect(first.max_temp).to eq(75.81)
+        expect(first.min_temp).to eq(47.14)
+        expect(first.conditions).to eq('scattered clouds')
+        expect(first.icon).to eq('03d')
+
+        last = result.last
+        expect(last).to respond_to(:date)
+        expect(last).to respond_to(:sunrise)
+        expect(last).to respond_to(:sunset)
+        expect(last).to respond_to(:max_temp)
+        expect(last).to respond_to(:min_temp)
+        expect(last).to respond_to(:conditions)
+        expect(last).to respond_to(:icon)
+        expect(last.date).to eq('2021-04-26')
+        expect(last.max_temp).to eq(75.56)
+        expect(last.min_temp).to eq(51.35)
+        expect(last.conditions).to eq('broken clouds')
+        expect(last.icon).to eq('04d')
+      end
+    end
+  end
+
   def current_weather_keys
     %i{ datetime
           sunrise
@@ -97,6 +166,7 @@ RSpec.describe 'Weather Service' do
           icon
     }
   end
+
   def daily_weather_keys
     %i{ date
           sunrise
@@ -107,6 +177,7 @@ RSpec.describe 'Weather Service' do
           icon
     }
   end
+
   def hourly_weather_keys
     %i{time temperature conditions icon}
   end

@@ -1,17 +1,18 @@
 class WeatherService
-  def self.fetch_forecast(latitude, longitude)
+  def self.fetch_forecast(latitude, longitude, num_daily: 5, num_hourly: 8)
     response = get_onecall(latitude, longitude)
-    format_forecast_response(response)
+    format_forecast_response(response, num_daily, num_hourly)
   end
 
-  # def self.fetch_hourly(latitude, longitude, num_results)
-  #   response = get_onecall(latitude, longitude)
-  #   format_hourly_response(num_results)
-  # end
+  def self.fetch_hourly(latitude, longitude, num_results: 8)
+    response = get_onecall(latitude, longitude)
+    format_hourly_response(response, num_results)
+  end
 
-  # def self.fetch_daily(lat, lng, scope, num_results)
-
-  # end
+  def self.fetch_daily(latitude, longitude, num_results: 8)
+    response = get_onecall(latitude, longitude)
+    format_daily_response(response, num_results)
+  end
 
   private_class_method
 
@@ -30,7 +31,7 @@ class WeatherService
     end
   end
 
-  def self.format_forecast_response(response, num_daily: 5, num_hourly: 8)
+  def self.format_forecast_response(response, num_daily, num_hourly)
     body = JSON.parse(response.body, symbolize_names: true)
 
     OpenStruct.new({
@@ -39,6 +40,26 @@ class WeatherService
       daily_weather: parse_daily_weather(body, num_daily),
       hourly_weather: parse_hourly_weather(body, num_hourly)
     })
+  end
+
+  def self.format_hourly_response(response, num_results)
+    body = JSON.parse(response.body, symbolize_names: true)
+
+    parsed = parse_hourly_weather(body, num_results)
+
+    parsed.map do |hour_weather|
+      OpenStruct.new(hour_weather)
+    end
+  end
+
+  def self.format_daily_response(response, num_results)
+    body = JSON.parse(response.body, symbolize_names: true)
+
+    parsed = parse_daily_weather(body, num_results)
+
+    parsed.map do |day_weather|
+      OpenStruct.new(day_weather)
+    end
   end
 
   # rubocop:disable Metrics/MethodLength
