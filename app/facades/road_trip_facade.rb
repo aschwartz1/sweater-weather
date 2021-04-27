@@ -38,15 +38,19 @@ class RoadTripFacade
 
   def self.trim_eta_weather(data)
     {
-      temperature: data.temperature,
+      temperature: data.temperature || average(data.max_temp, data.min_temp),
       conditions: data.conditions
     }
   end
 
-  def self.fetch_weather_for_scope(lat, lng, scope, results_needed)
-    return WeatherService.fetch_hourly(lat, lng, results_needed) if scope == :hours
+  def self.average(num1, num2)
+    (num1 = num2) / 2.0
+  end
 
-    WeatherService.fetch_daily(lat, lng, results_needed)
+  def self.fetch_weather_for_scope(lat, lng, scope, results_needed)
+    return WeatherService.fetch_hourly(lat, lng, num_results: results_needed) if scope == :hours
+
+    WeatherService.fetch_daily(lat, lng, num_results: results_needed)
   end
 
   def self.days_or_hours(hours)
