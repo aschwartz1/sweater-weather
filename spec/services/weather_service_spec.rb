@@ -17,15 +17,15 @@ RSpec.describe 'Weather Service' do
 
         first = hourly_weather.first
         expect(first.keys).to eq(hourly_weather_keys)
-        expect(first[:time]).to eq('14:00:00')
-        expect(first[:temperature]).to eq(59.74)
+        expect(first[:time]).to eq('13:00:00')
+        expect(first[:temperature]).to eq(58.66)
         expect(first[:conditions]).to eq('overcast clouds')
         expect(first[:icon]).to eq('04d')
 
         last = hourly_weather.last
         expect(last.keys).to eq(hourly_weather_keys)
-        expect(last[:time]).to eq('21:00:00')
-        expect(last[:temperature]).to eq(57.18)
+        expect(last[:time]).to eq('20:00:00')
+        expect(last[:temperature]).to eq(58.95)
         expect(last[:conditions]).to eq('overcast clouds')
         expect(last[:icon]).to eq('04n')
       end
@@ -42,21 +42,21 @@ RSpec.describe 'Weather Service' do
 
         first = daily_weather.first
         expect(first.keys).to eq(daily_weather_keys)
-        expect(first[:date]).to eq('2021-04-25')
-        expect(first[:sunrise]).to eq('2021-04-25 06:07:37 -0600')
-        expect(first[:sunset]).to eq('2021-04-25 19:47:44 -0600')
-        expect(first[:max_temp]).to eq(75.81)
-        expect(first[:min_temp]).to eq(47.14)
-        expect(first[:conditions]).to eq('scattered clouds')
-        expect(first[:icon]).to eq('03d')
+        expect(first[:date]).to eq('2021-04-24')
+        expect(first[:sunrise]).to eq('2021-04-24 06:08:57 -0600')
+        expect(first[:sunset]).to eq('2021-04-24 19:46:43 -0600')
+        expect(first[:max_temp]).to eq(65.26)
+        expect(first[:min_temp]).to eq(38.21)
+        expect(first[:conditions]).to eq('overcast clouds')
+        expect(first[:icon]).to eq('04d')
 
         last = daily_weather.last
         expect(last.keys).to eq(daily_weather_keys)
-        expect(last[:date]).to eq('2021-04-29')
-        expect(last[:sunrise]).to eq('2021-04-29 06:02:27 -0600')
-        expect(last[:sunset]).to eq('2021-04-29 19:51:48 -0600')
-        expect(last[:max_temp]).to eq(65.14)
-        expect(last[:min_temp]).to eq(44.15)
+        expect(last[:date]).to eq('2021-04-28')
+        expect(last[:sunrise]).to eq('2021-04-28 06:03:43 -0600')
+        expect(last[:sunset]).to eq('2021-04-28 19:50:47 -0600')
+        expect(last[:max_temp]).to eq(61.92)
+        expect(last[:min_temp]).to eq(39.69)
         expect(last[:conditions]).to eq('light rain')
         expect(last[:icon]).to eq('10d')
       end
@@ -96,8 +96,8 @@ RSpec.describe 'Weather Service' do
         expect(first).to respond_to(:temperature)
         expect(first).to respond_to(:conditions)
         expect(first).to respond_to(:icon)
-        expect(first.time).to eq('14:00:00')
-        expect(first.temperature).to eq(59.74)
+        expect(first.time).to eq('13:00:00')
+        expect(first.temperature).to eq(58.66)
         expect(first.conditions).to eq('overcast clouds')
         expect(first.icon).to eq('04d')
 
@@ -106,11 +106,18 @@ RSpec.describe 'Weather Service' do
         expect(first).to respond_to(:temperature)
         expect(first).to respond_to(:conditions)
         expect(first).to respond_to(:icon)
-        expect(last.time).to eq('17:00:00')
-        expect(last.temperature).to eq(64.6)
+        expect(last.time).to eq('16:00:00')
+        expect(last.temperature).to eq(62.74)
         expect(last.conditions).to eq('overcast clouds')
         expect(last.icon).to eq('04d')
       end
+    end
+
+    it 'returns empty array if num_results is out of range' do
+        result = WeatherService.fetch_daily(latitude, longitude, num_results: 49)
+
+        expect(result).to be_an(Array)
+        expect(result).to be_empty
     end
   end
 
@@ -130,11 +137,11 @@ RSpec.describe 'Weather Service' do
         expect(first).to respond_to(:min_temp)
         expect(first).to respond_to(:conditions)
         expect(first).to respond_to(:icon)
-        expect(first.date).to eq('2021-04-25')
-        expect(first.max_temp).to eq(75.81)
-        expect(first.min_temp).to eq(47.14)
-        expect(first.conditions).to eq('scattered clouds')
-        expect(first.icon).to eq('03d')
+        expect(first.date).to eq('2021-04-24')
+        expect(first.max_temp).to eq(65.26)
+        expect(first.min_temp).to eq(38.21)
+        expect(first.conditions).to eq('overcast clouds')
+        expect(first.icon).to eq('04d')
 
         last = result.last
         expect(last).to respond_to(:date)
@@ -144,12 +151,19 @@ RSpec.describe 'Weather Service' do
         expect(last).to respond_to(:min_temp)
         expect(last).to respond_to(:conditions)
         expect(last).to respond_to(:icon)
-        expect(last.date).to eq('2021-04-26')
-        expect(last.max_temp).to eq(75.56)
-        expect(last.min_temp).to eq(51.35)
-        expect(last.conditions).to eq('broken clouds')
-        expect(last.icon).to eq('04d')
+        expect(last.date).to eq('2021-04-25')
+        expect(last.max_temp).to eq(75.81)
+        expect(last.min_temp).to eq(47.14)
+        expect(last.conditions).to eq('scattered clouds')
+        expect(last.icon).to eq('03d')
       end
+    end
+
+    it 'returns empty array if num_results is out of range' do
+        result = WeatherService.fetch_daily(latitude, longitude, num_results: 8)
+
+        expect(result).to be_an(Array)
+        expect(result).to be_empty
     end
   end
 

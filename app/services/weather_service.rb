@@ -1,15 +1,15 @@
 class WeatherService
-  def self.fetch_forecast(latitude, longitude, num_daily: 5, num_hourly: 8)
+  def self.fetch_forecast(latitude, longitude, num_daily: 6, num_hourly: 8)
     response = get_onecall(latitude, longitude)
     format_forecast_response(response, num_daily, num_hourly)
   end
 
-  def self.fetch_hourly(latitude, longitude, num_results: 8)
+  def self.fetch_hourly(latitude, longitude, num_results: 9)
     response = get_onecall(latitude, longitude)
     format_hourly_response(response, num_results)
   end
 
-  def self.fetch_daily(latitude, longitude, num_results: 8)
+  def self.fetch_daily(latitude, longitude, num_results: 9)
     response = get_onecall(latitude, longitude)
     format_daily_response(response, num_results)
   end
@@ -83,12 +83,12 @@ class WeatherService
 
   # rubocop:disable Metrics/MethodLength
   def self.parse_daily_weather(body, days)
-    return [] unless days.positive?
+    return [] unless days.positive? && days <= 7
 
     offset = body[:timezone_offset]
     daily = body[:daily]
 
-    (1..days).map do |i|
+    (0..(days - 1)).map do |i|
       {
         date: local_time_from_unix(daily[i][:dt], offset).strftime('%F'),
         sunrise: local_time_from_unix(daily[i][:sunrise], offset).to_s,
@@ -104,12 +104,12 @@ class WeatherService
 
   # rubocop:disable Metrics/MethodLength
   def self.parse_hourly_weather(body, hours)
-    return [] unless hours.positive?
+    return [] unless hours.positive? && hours <= 48
 
     offset = body[:timezone_offset]
     hourly = body[:hourly]
 
-    (1..hours).map do |i|
+    (0..(hours - 1)).map do |i|
       {
         time: local_time_from_unix(hourly[i][:dt], offset).strftime('%T'),
         temperature: hourly[i][:temp],
