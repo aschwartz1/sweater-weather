@@ -1,14 +1,17 @@
 class WeatherService
-  def self.fetch_weather_data(geocoords)
-    response = weather_connection.get('onecall') do |req|
-      req.params[:lat] = geocoords.latitude
-      req.params[:lon] = geocoords.longitude
-      req.params[:units] = 'imperial'
-      req.params[:exclude] = 'minutely,alerts'
-    end
-
-    format_weather_response(response)
+  def self.fetch_forecast(latitude, longitude)
+    response = get_onecall(latitude, longitude)
+    format_forecast_response(response)
   end
+
+  # def self.fetch_hourly(latitude, longitude, num_results)
+  #   response = get_onecall(latitude, longitude)
+  #   format_hourly_response(num_results)
+  # end
+
+  # def self.fetch_daily(lat, lng, scope, num_results)
+
+  # end
 
   private_class_method
 
@@ -18,14 +21,23 @@ class WeatherService
     end
   end
 
-  def self.format_weather_response(response)
+  def self.get_onecall(latitude, longitude)
+    weather_connection.get('onecall') do |req|
+      req.params[:lat] = latitude
+      req.params[:lon] = longitude
+      req.params[:units] = 'imperial'
+      req.params[:exclude] = 'minutely,alerts'
+    end
+  end
+
+  def self.format_forecast_response(response, num_daily: 5, num_hourly: 8)
     body = JSON.parse(response.body, symbolize_names: true)
 
     OpenStruct.new({
       id: nil,
       current_weather: parse_current_weather(body),
-      daily_weather: parse_daily_weather(body, 5),
-      hourly_weather: parse_hourly_weather(body, 8)
+      daily_weather: parse_daily_weather(body, num_daily),
+      hourly_weather: parse_hourly_weather(body, num_hourly)
     })
   end
 

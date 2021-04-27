@@ -2,22 +2,14 @@ require_relative '../../app/services/weather_service.rb'
 
 require 'rails_helper'
 
-RSpec.describe 'Forecast Service' do
-  let(:geocoords) { OpenStruct.new({latitude: 39.738453, longitude: -104.984853}) }
+RSpec.describe 'Weather Service' do
+  let(:latitude) { 39.738453 }
+  let(:longitude) { -104.984853 }
 
-  describe 'General Structure' do
-    it 'has an id' do
+  describe 'Forecast' do
+    it 'Hourly weather is correct' do
       VCR.use_cassette('denver_weather_request') do
-        result = WeatherService.fetch_weather_data(geocoords)
-        expect(result.id).to be_nil
-      end
-    end
-  end
-
-  describe 'Hourly Weather' do
-    it 'is correct' do
-      VCR.use_cassette('denver_weather_request') do
-        result = WeatherService.fetch_weather_data(geocoords)
+        result = WeatherService.fetch_forecast(latitude, longitude)
 
         hourly_weather = result.hourly_weather
 
@@ -39,12 +31,10 @@ RSpec.describe 'Forecast Service' do
         expect(last[:icon]).to eq('04n')
       end
     end
-  end
 
-  describe 'Daily Weather' do
-    it 'is correct' do
+    it 'Daily weather is correct' do
       VCR.use_cassette('denver_weather_request') do
-        result = WeatherService.fetch_weather_data(geocoords)
+        result = WeatherService.fetch_forecast(latitude, longitude)
 
         daily_weather = result.daily_weather
 
@@ -72,12 +62,10 @@ RSpec.describe 'Forecast Service' do
         expect(last[:icon]).to eq('10d')
       end
     end
-  end
 
-  describe 'Current Weather' do
-    it 'is correct' do
+    it 'Current weather is correct' do
       VCR.use_cassette('denver_weather_request') do
-        result = WeatherService.fetch_weather_data(geocoords)
+        result = WeatherService.fetch_forecast(latitude, longitude)
 
         current_weather = result.current_weather
 
@@ -123,4 +111,3 @@ RSpec.describe 'Forecast Service' do
     %i{time temperature conditions icon}
   end
 end
-
