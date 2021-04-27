@@ -1,13 +1,18 @@
+# rubocop:disable Metrics/ClassLength
 class WeatherService
-  def self.fetch_weather_data(geocoords)
-    response = weather_connection.get('onecall') do |req|
-      req.params[:lat] = geocoords.latitude
-      req.params[:lon] = geocoords.longitude
-      req.params[:units] = 'imperial'
-      req.params[:exclude] = 'minutely,alerts'
-    end
+  def self.fetch_forecast(latitude, longitude, num_daily: 5, num_hourly: 8)
+    response = get_onecall(latitude, longitude)
+    format_forecast_response(response, num_daily, num_hourly)
+  end
 
-    format_weather_response(response)
+  def self.fetch_hourly(latitude, longitude, num_results: 9)
+    response = get_onecall(latitude, longitude)
+    format_hourly_response(response, num_results)
+  end
+
+  def self.fetch_daily(latitude, longitude, num_results: 9)
+    response = get_onecall(latitude, longitude)
+    format_daily_response(response, num_results)
   end
 
   private_class_method
@@ -18,15 +23,42 @@ class WeatherService
     end
   end
 
-  def self.format_weather_response(response)
+  def self.get_onecall(latitude, longitude)
+    weather_connection.get('onecall') do |req|
+      req.params[:lat] = latitude
+      req.params[:lon] = longitude
+      req.params[:units] = 'imperial'
+      req.params[:exclude] = 'minutely,alerts'
+    end
+  end
+
+  def self.format_forecast_response(response, num_daily, num_hourly)
     body = JSON.parse(response.body, symbolize_names: true)
 
     OpenStruct.new({
       id: nil,
       current_weather: parse_current_weather(body),
-      daily_weather: parse_daily_weather(body, 5),
-      hourly_weather: parse_hourly_weather(body, 8)
+      daily_weather: parse_daily_weather(body, num_daily, include_today: false),
+      hourly_weather: parse_hourly_weather(body, num_hourly, include_today: false)
     })
+  end
+
+  def self.format_hourly_response(response, num_results)
+    body = JSON.parse(response.body, symbolize_names: true)
+    parsed = parse_hourly_weather(body, num_results)
+
+    parsed.map do |hour_weather|
+      OpenStruct.new(hour_weather)
+    end
+  end
+
+  def self.format_daily_response(response, num_results)
+    body = JSON.parse(response.body, symbolize_names: true)
+    parsed = parse_daily_weather(body, num_results)
+
+    parsed.map do |day_weather|
+      OpenStruct.new(day_weather)
+    end
   end
 
   # rubocop:disable Metrics/MethodLength
@@ -49,13 +81,15 @@ class WeatherService
   # rubocop:enable Metrics/MethodLength
 
   # rubocop:disable Metrics/MethodLength
-  def self.parse_daily_weather(body, days)
-    return [] unless days.positive?
+  def self.parse_daily_weather(body, days, include_today: true)
+    return [] unless days.positive? && days <= 7
 
+    start_index = include_today ? 0 : 1
+    end_index = include_today ? (days - 1) : days
     offset = body[:timezone_offset]
     daily = body[:daily]
 
-    (1..days).map do |i|
+    (start_index..end_index).map do |i|
       {
         date: local_time_from_unix(daily[i][:dt], offset).strftime('%F'),
         sunrise: local_time_from_unix(daily[i][:sunrise], offset).to_s,
@@ -70,13 +104,15 @@ class WeatherService
   # rubocop:enable Metrics/MethodLength
 
   # rubocop:disable Metrics/MethodLength
-  def self.parse_hourly_weather(body, hours)
-    return [] unless hours.positive?
+  def self.parse_hourly_weather(body, hours, include_today: true)
+    return [] unless hours.positive? && hours <= 48
 
+    start_index = include_today ? 0 : 1
+    end_index = include_today ? (hours - 1) : hours
     offset = body[:timezone_offset]
     hourly = body[:hourly]
 
-    (1..hours).map do |i|
+    (start_index..end_index).map do |i|
       {
         time: local_time_from_unix(hourly[i][:dt], offset).strftime('%T'),
         temperature: hourly[i][:temp],
@@ -91,3 +127,4 @@ class WeatherService
     Time.find_zone(offset).at(timestamp)
   end
 end
+# rubocop:enable Metrics/ClassLength

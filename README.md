@@ -9,6 +9,7 @@ The Back End API portion of a proposed SOA application to plan road trips. This 
     - [Background Image for a City](#background-image-for-a-city)
     - [User Creation](#user-creation)
     - [User Log In](#user-log-in)
+    - [Road Trip](#road-trip)
 
 # Endpoints
 ## Weather Data for a City
@@ -246,6 +247,70 @@ The Back End API portion of a proposed SOA application to plan road trips. This 
 >    "type": "users",
 >    "attributes": {
 >      "message": "Invalid credentials",
+>  }]
+>}
+>```
+
+## Road Trip
+- Body Data
+  - `origin` **required**
+  - `destination` **required**
+  - `api_key` **required**
+- Success Response Info
+  - `200 OK`
+  - Returns top-level `data` element with main payload nested in `attributes`
+  - `id` will be null
+  - `attributes`
+    - `start_city` - origin, as found by MapQuest from `origin` request parameter
+    - `end_city` - destination, as found by MapQuest from `destination` request parameter
+    - `travel_time` - travel time, as estimated by MapQuest
+    - `weather_at_eta` - hash of `temperature` and `conditions` of destination city at eta (if leaving right now)
+
+>```
+>POST /api/v1/road_trip
+>Content-Type: application/json
+>Accept: application/json
+>
+>{
+>  "origin": "Denver,CO",
+>  "destination": "Pueblo,CO",
+>  "api_key": "TOTALLY_A_VALID_KEY"
+>}
+>```
+>```json
+>{
+>  "data": {
+>    "id": null,
+>    "type": "roadtrip",
+>    "attributes": {
+>      "start_city": "Denver, CO",
+>      "end_city": "Pueblo, CO",
+>      "travel_time": "1 hours, 44 minutes",
+>      "weather_at_eta": {
+>        "temperature": 65.1,
+>        "conditions": "broken clouds"
+>      }
+>    }
+>  }
+>}
+>```
+
+- Failure Response Info
+  - Possible error codes:
+    - `400 Bad Request`, if the request sent no body data
+    - `401 Unauthorized`, if the api key provided is invalid
+  - Returns top-level `data` element which will ALWAYS be an array
+    - `id` will be null
+    - `attributes`
+      - `message` - A message about the error
+
+>```json
+>{
+>  "data": [{
+>    "id": null,
+>    "type": "roadtrip",
+>    "attributes": {
+>      "message": "Invalid api key",
 >  }]
 >}
 >```
