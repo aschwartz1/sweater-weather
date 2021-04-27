@@ -44,7 +44,7 @@ class RoadTripFacade
   end
 
   def self.average(num1, num2)
-    (num1 = num2) / 2.0
+    (num1 + num2) / 2.0
   end
 
   def self.fetch_weather_for_scope(lat, lng, scope, results_needed)
@@ -55,6 +55,7 @@ class RoadTripFacade
 
   def self.days_or_hours(hours)
     return :hours if hours < 48
+
     :days
   end
 

@@ -1,3 +1,4 @@
+# rubocop:disable Metrics/ClassLength
 class WeatherService
   def self.fetch_forecast(latitude, longitude, num_daily: 5, num_hourly: 8)
     response = get_onecall(latitude, longitude)
@@ -44,7 +45,6 @@ class WeatherService
 
   def self.format_hourly_response(response, num_results)
     body = JSON.parse(response.body, symbolize_names: true)
-
     parsed = parse_hourly_weather(body, num_results)
 
     parsed.map do |hour_weather|
@@ -54,7 +54,6 @@ class WeatherService
 
   def self.format_daily_response(response, num_results)
     body = JSON.parse(response.body, symbolize_names: true)
-
     parsed = parse_daily_weather(body, num_results)
 
     parsed.map do |day_weather|
@@ -128,3 +127,4 @@ class WeatherService
     Time.find_zone(offset).at(timestamp)
   end
 end
+# rubocop:enable Metrics/ClassLength
