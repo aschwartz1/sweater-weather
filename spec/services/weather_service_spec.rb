@@ -45,6 +45,7 @@ RSpec.describe 'Weather Service' do
         expect(first[:date]).to eq('2021-04-24')
         expect(first[:sunrise]).to eq('2021-04-24 06:08:57 -0600')
         expect(first[:sunset]).to eq('2021-04-24 19:46:43 -0600')
+        expect(first[:day_temp]).to eq(58.6)
         expect(first[:max_temp]).to eq(65.26)
         expect(first[:min_temp]).to eq(38.21)
         expect(first[:conditions]).to eq('overcast clouds')
@@ -55,6 +56,7 @@ RSpec.describe 'Weather Service' do
         expect(last[:date]).to eq('2021-04-28')
         expect(last[:sunrise]).to eq('2021-04-28 06:03:43 -0600')
         expect(last[:sunset]).to eq('2021-04-28 19:50:47 -0600')
+        expect(last[:day_temp]).to eq(56.26)
         expect(last[:max_temp]).to eq(61.92)
         expect(last[:min_temp]).to eq(39.69)
         expect(last[:conditions]).to eq('light rain')
@@ -133,11 +135,15 @@ RSpec.describe 'Weather Service' do
         expect(first).to respond_to(:date)
         expect(first).to respond_to(:sunrise)
         expect(first).to respond_to(:sunset)
+        expect(first).to respond_to(:day_temp)
         expect(first).to respond_to(:max_temp)
         expect(first).to respond_to(:min_temp)
         expect(first).to respond_to(:conditions)
         expect(first).to respond_to(:icon)
         expect(first.date).to eq('2021-04-24')
+        expect(first.sunrise).to eq('2021-04-24 06:08:57 -0600')
+        expect(first.sunset).to eq('2021-04-24 19:46:43 -0600')
+        expect(first.day_temp).to eq(58.6)
         expect(first.max_temp).to eq(65.26)
         expect(first.min_temp).to eq(38.21)
         expect(first.conditions).to eq('overcast clouds')
@@ -147,11 +153,15 @@ RSpec.describe 'Weather Service' do
         expect(last).to respond_to(:date)
         expect(last).to respond_to(:sunrise)
         expect(last).to respond_to(:sunset)
+        expect(last).to respond_to(:day_temp)
         expect(last).to respond_to(:max_temp)
         expect(last).to respond_to(:min_temp)
         expect(last).to respond_to(:conditions)
         expect(last).to respond_to(:icon)
         expect(last.date).to eq('2021-04-25')
+        expect(last.sunrise).to eq('2021-04-25 06:07:37 -0600')
+        expect(last.sunset).to eq('2021-04-25 19:47:44 -0600')
+        expect(last.day_temp).to eq(68.92)
         expect(last.max_temp).to eq(75.81)
         expect(last.min_temp).to eq(47.14)
         expect(last.conditions).to eq('scattered clouds')
@@ -185,6 +195,7 @@ RSpec.describe 'Weather Service' do
     %i{ date
           sunrise
           sunset
+          day_temp
           max_temp
           min_temp
           conditions

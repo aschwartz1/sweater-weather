@@ -93,6 +93,7 @@ class WeatherService
         date: local_time_from_unix(daily[i][:dt], offset).strftime('%F'),
         sunrise: local_time_from_unix(daily[i][:sunrise], offset).to_s,
         sunset: local_time_from_unix(daily[i][:sunset], offset).to_s,
+        day_temp: daily[i][:temp][:day],
         max_temp: daily[i][:temp][:max],
         min_temp: daily[i][:temp][:min],
         conditions: daily[i][:weather].first[:description],
