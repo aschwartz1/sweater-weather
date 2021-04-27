@@ -84,5 +84,16 @@ RSpec.describe User, type: :model do
         expect(found).to be_nil
       end
     end
+
+    describe '::valid_api_key?' do
+      it 'returns true if the key exists' do
+        user = create(:user)
+        expect(User.valid_api_key?(user.api_key)).to eq(true)
+      end
+
+      it 'returns false if the key does not exist' do
+        expect(User.valid_api_key?('1234')).to eq(false)
+      end
+    end
   end
 end

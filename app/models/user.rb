@@ -20,6 +20,10 @@ class User < ApplicationRecord
     user
   end
 
+  def self.valid_api_key?(key)
+    User.exists?(api_key: key)
+  end
+
   private
 
   def normalize_email
