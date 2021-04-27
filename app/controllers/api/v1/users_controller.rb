@@ -25,7 +25,9 @@ class Api::V1::UsersController < ApplicationController
   end
 
   def validate_params_exist
-    render json: errors_serializer(['All params not found in request body']), status: :bad_request unless all_params_exist?
+    return if all_params_exist?
+
+    render json: errors_serializer(['All params not found in request body']), status: :bad_request
   end
 
   def all_params_exist?
