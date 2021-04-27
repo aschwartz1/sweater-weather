@@ -34,16 +34,5 @@ RSpec.describe 'Forecast' do
       expect(response).to have_http_status(400)
     end
   end
-
-  # describe 'instance method' do
-  #   describe '#fetch_geocoords' do
-  #     it 'works' do
-  #       # TODO: make the call w/ 'denver,co' as location
-  #       expect(result).to be_an(OpenStruct)
-  #       expect(result.latitude).to eq(39.738453)
-  #       expect(results.longitude).to eq(-104.984853)
-  #     end
-  #   end
-  # end
 end
 
