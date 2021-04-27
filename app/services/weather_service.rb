@@ -1,5 +1,5 @@
 class WeatherService
-  def self.fetch_forecast(latitude, longitude, num_daily: 5, num_hourly: 7)
+  def self.fetch_forecast(latitude, longitude, num_daily: 5, num_hourly: 8)
     response = get_onecall(latitude, longitude)
     format_forecast_response(response, num_daily, num_hourly)
   end

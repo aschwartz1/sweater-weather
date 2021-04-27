@@ -1,10 +1,13 @@
+require_relative '../../../services/map_service'
+require_relative '../../../services/weather_service'
+
 class Api::V1::ForecastsController < ApplicationController
   before_action :validate_params
 
   def show
-    geocords = MapService.fetch_geocoords(params[:location])
+    geocoords = MapService.fetch_geocoords(params[:location])
 
-    weather_data = WeatherService.fetch_weather_data(geocords)
+    weather_data = WeatherService.fetch_forecast(geocoords.latitude, geocoords.longitude)
 
     render json: ForecastSerializer.new(weather_data)
   end
