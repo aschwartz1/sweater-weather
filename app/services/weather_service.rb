@@ -1,5 +1,5 @@
 class WeatherService
-  def self.fetch_forecast(latitude, longitude, num_daily: 6, num_hourly: 8)
+  def self.fetch_forecast(latitude, longitude, num_daily: 5, num_hourly: 7)
     response = get_onecall(latitude, longitude)
     format_forecast_response(response, num_daily, num_hourly)
   end
@@ -37,8 +37,8 @@ class WeatherService
     OpenStruct.new({
       id: nil,
       current_weather: parse_current_weather(body),
-      daily_weather: parse_daily_weather(body, num_daily),
-      hourly_weather: parse_hourly_weather(body, num_hourly)
+      daily_weather: parse_daily_weather(body, num_daily, include_today: false),
+      hourly_weather: parse_hourly_weather(body, num_hourly, include_today: false)
     })
   end
 
@@ -82,18 +82,19 @@ class WeatherService
   # rubocop:enable Metrics/MethodLength
 
   # rubocop:disable Metrics/MethodLength
-  def self.parse_daily_weather(body, days)
+  def self.parse_daily_weather(body, days, include_today: true)
     return [] unless days.positive? && days <= 7
 
+    start_index = include_today ? 0 : 1
+    end_index = include_today ? (days - 1) : days
     offset = body[:timezone_offset]
     daily = body[:daily]
 
-    (0..(days - 1)).map do |i|
+    (start_index..end_index).map do |i|
       {
         date: local_time_from_unix(daily[i][:dt], offset).strftime('%F'),
         sunrise: local_time_from_unix(daily[i][:sunrise], offset).to_s,
         sunset: local_time_from_unix(daily[i][:sunset], offset).to_s,
-        day_temp: daily[i][:temp][:day],
         max_temp: daily[i][:temp][:max],
         min_temp: daily[i][:temp][:min],
         conditions: daily[i][:weather].first[:description],
@@ -104,13 +105,15 @@ class WeatherService
   # rubocop:enable Metrics/MethodLength
 
   # rubocop:disable Metrics/MethodLength
-  def self.parse_hourly_weather(body, hours)
+  def self.parse_hourly_weather(body, hours, include_today: true)
     return [] unless hours.positive? && hours <= 48
 
+    start_index = include_today ? 0 : 1
+    end_index = include_today ? (hours - 1) : hours
     offset = body[:timezone_offset]
     hourly = body[:hourly]
 
-    (0..(hours - 1)).map do |i|
+    (start_index..end_index).map do |i|
       {
         time: local_time_from_unix(hourly[i][:dt], offset).strftime('%T'),
         temperature: hourly[i][:temp],
