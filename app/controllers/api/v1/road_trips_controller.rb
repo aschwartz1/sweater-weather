@@ -4,8 +4,10 @@ class Api::V1::RoadTripsController < ApplicationController
 
   def create
     if User.valid_api_key?(road_trip_params[:api_key])
-      trip = fetch_road_trip(road_trip_params[:origin], road_trip_params[:destination])
-      render json: RoadTripSerializer.new(trip)
+      directions = fetch_directions(road_trip_params[:origin], road_trip_params[:destination])
+      # TODO: get start lat & long, end lat & long, trip dur'n and send to fetch_weather method
+      weather = fetch_destination_weather(directions[:end_city][:lat], directions[:end_city][:lng], directions[:travel_time])
+      render json: RoadTripSerializer.new(create_trip(directions, weather))
     else
       render json: errors_serializer(['Invalid api key']), status: :unauthorized
     end
@@ -13,20 +15,62 @@ class Api::V1::RoadTripsController < ApplicationController
 
   private
 
-  def fetch_road_trip(origin, destination)
-    format_road_trip('placeholder')
-  end
-
-  def format_road_trip(args)
-    weather_data = {temperature: 60.1, conditions: 'conditions'}
-
+  def create_trip(directions, weather)
     OpenStruct.new({
       id: nil,
-      start_city: 'start',
-      end_city: 'end',
-      travel_time: 'travel time',
-      weather_at_eta: weather_data
+      start_city: directions[:start_city][:name],
+      end_city: directions[:end_city][:name],
+      travel_time: format_travel_time(directions[:travel_time]),
+      weather_at_eta: weather
     })
+  end
+
+  def format_travel_time(time)
+    # hour minute second
+    hms = time.split(':')
+    "#{hms[0].to_i} hour(s), #{hms[1].to_i} minutes"
+  end
+
+  def fetch_destination_weather(lat, lng, travel_time)
+    {
+      temperature: 0,
+      conditions: 'not yet implemented'
+    }
+  end
+
+  def fetch_directions(origin, destination)
+    response = directions_connection.get('route') do |req|
+      req.params[:from] = origin
+      req.params[:to] = destination
+    end
+
+    format_directions(response)
+  end
+
+  def format_directions(response)
+    body = JSON.parse(response.body, symbolize_names: true)
+    route = body[:route]
+    locations = route[:locations]
+
+    {
+      start_city: {
+        name: "#{locations[0][:adminArea5]}, #{route[:locations][0][:adminArea3]}",
+        lat: locations[0][:latLng][:lat],
+        lng: locations[0][:latLng][:lng]
+      },
+      end_city: {
+        name: "#{locations[1][:adminArea5]}, #{route[:locations][1][:adminArea3]}",
+        lat: locations[1][:latLng][:lat],
+        lng: locations[1][:latLng][:lng]
+      },
+      travel_time: route[:formattedTime]
+    }
+  end
+
+  def directions_connection
+    @directions_connection ||= Faraday.new('http://www.mapquestapi.com/directions/v2') do |conn|
+      conn.params[:key] = ENV['mapquest_key']
+    end
   end
 
   def road_trip_params

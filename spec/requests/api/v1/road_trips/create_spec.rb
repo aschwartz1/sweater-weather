@@ -16,7 +16,7 @@ RSpec.describe 'Road Trips Create', type: :request do
     end
 
     it 'returns correct structure' do
-      post api_v1_road_trips_path, headers: @headers, params: @body, as: :json
+      post api_v1_road_trip_path, headers: @headers, params: @body, as: :json
 
       expect(response).to be_successful
       body = JSON.parse(response.body, symbolize_names: true)
@@ -36,21 +36,21 @@ RSpec.describe 'Road Trips Create', type: :request do
       expect(attributes[:weather_at_eta].keys).to eq([:temperature, :conditions])
       weather = attributes[:weather_at_eta]
 
-      expect(weather[:temperature]).to be_a(Float)
+      expect(weather[:temperature]).to be_a(Float).or be_an(Integer)
       expect(weather[:conditions]).to be_a(String)
     end
 
-    xit 'returns users data, excluding password' do
-      post api_v1_road_trips_path, headers: @headers, params: @body, as: :json
+    it 'returns start & end cities and travel time' do
+      post api_v1_road_trip_path, headers: @headers, params: @body, as: :json
 
       expect(response).to be_successful
       body = JSON.parse(response.body, symbolize_names: true)
       data = body[:data]
       attributes = data[:attributes]
 
-      expect(data[:id]).to eq(@user.id.to_s)
-      expect(attributes[:email]).to eq(@user.email)
-      expect(attributes[:api_key]).to eq(@user.api_key)
+      expect(attributes[:start_city]).to eq('Denver, CO')
+      expect(attributes[:end_city]).to eq('Pueblo, CO')
+      expect(attributes[:travel_time]).to eq('1 hour(s), 44 minutes')
     end
   end
 
@@ -62,7 +62,7 @@ RSpec.describe 'Road Trips Create', type: :request do
         'api_key': 'invalid',
       }
 
-      post api_v1_road_trips_path, headers: @headers, params: body, as: :json
+      post api_v1_road_trip_path, headers: @headers, params: body, as: :json
 
       expect(response).to have_http_status(401)
       body = JSON.parse(response.body, symbolize_names: true)
@@ -80,8 +80,11 @@ RSpec.describe 'Road Trips Create', type: :request do
     end
 
     it 'returns error if required body params are not sent' do
-      post api_v1_road_trips_path, headers: @headers, as: :json
+      post api_v1_road_trip_path, headers: @headers, as: :json
       expect(response).to have_http_status(400)
+    end
+
+    xit 'returns error with message if route is impossible' do
     end
   end
 end
