@@ -3,7 +3,6 @@ class Api::V1::BackgroundsController < ApplicationController
 
   def show
     background_response = fetch_background(params[:location])
-    background_response.id = nil
 
     render json: ImageSerializer.new(background_response)
   end
@@ -45,6 +44,7 @@ class Api::V1::BackgroundsController < ApplicationController
     image_result = results[random_number(results.size)]
 
     OpenStruct.new({
+      id: nil,
       image: parse_image_info(image_result),
       credit: parse_credit_info(image_result)
     })

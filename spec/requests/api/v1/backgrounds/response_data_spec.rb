@@ -34,12 +34,6 @@ RSpec.describe 'Backgrounds' do
       end
     end
   end
-
-  describe 'sad path' do
-    xit 'returns __what?__ when no images are found' do
-
-    end
-  end
 end
 
 =begin expected response structure

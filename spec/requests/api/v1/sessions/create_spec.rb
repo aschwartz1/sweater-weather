@@ -71,7 +71,7 @@ RSpec.describe 'Sessions Create', type: :request do
       expect(attributes[:message]).to eq("Invalid credentials")
     end
 
-    it 'returns error with general message if password is invalid' do
+    it 'returns error with general message if email is invalid' do
       body = {
         'email': 'poop emoji',
         'password': 'password',
