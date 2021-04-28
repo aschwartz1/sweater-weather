@@ -21,12 +21,24 @@ The Back End API portion of a proposed SOA application to plan road trips. This 
 ## Getting Started
 ### Prerequisites
 - To run this application you will need Ruby 2.5.3 and Rails 5.2.5
-- Fork & Clone the repo -- both buttons at the top right of this page. Copy the SSH from the green button, and in your terminal type: `git clone <ssh from green button>`
+- You will also need to get a free api key from:
+  - [MapQuest](https://developer.mapquest.com/)
+  - [OpenWeather](https://openweathermap.org/api/one-call-api)
+  - [Unsplash](https://unsplash.com/developers)
+- Fork & Clone the repo. Copy the SSH from the green button and in your terminal type: `git clone <ssh from green button>`
 
 ### Installing
 - Install the gem packages: `bundle install`
 - Create the database by running the following command in your terminal
 `rails db:{drop, create, migrate}`
+- Setup your environment variables via Figaro
+  - `bundle exec figaro install`, which should create a file `config/application.yml` as well as add it to your `.gitignore`
+  - Add the following lines to that file, subbing in your api keys (Reminder, NEVER push your API keys to GitHub!)
+>  ```
+>  mapquest_key: <mapquest key>
+>  openweather_key: <openweather key>
+>  unsplash_key: 'Client-ID <unsplash key>'
+>  ```
 
 ## Testing
 This project uses RSpec for testing. Test files live under `/spec` and mirror the directory structure of their corresponding files in `/app`.
