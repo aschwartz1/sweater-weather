@@ -1,4 +1,3 @@
-require_relative '../../app/services/weather_service.rb'
 require 'rails_helper'
 
 RSpec.describe 'Weather Service' do
