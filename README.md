@@ -3,13 +3,34 @@ _Completed as the [final project](https://backend.turing.edu/module3/projects/sw
 
 The Back End API portion of a proposed SOA application to plan road trips. This app will allow users to see the current weather as well as the forecasted weather at the destination.
 
+# Contributors
+  - [Alex Schwartz](https://www.linkedin.com/in/alex-s-77659758/)
+ 
 # Contents
-1. [Endpoints](#endpoints)
+1. [Getting Started]
+    - [Prerequisites](#prerequisites)
+    - [Installing](#installing)
+    - [Testing](#testing)
+2. [Endpoints](#endpoints)
     - [Weather Data for a City](#weather-data-for-a-city)
     - [Background Image for a City](#background-image-for-a-city)
     - [User Creation](#user-creation)
     - [User Log In](#user-log-in)
     - [Road Trip](#road-trip)
+
+## Getting Started
+### Prerequisites
+- To run this application you will need Ruby 2.5.3 and Rails 5.2.5
+- Fork & Clone the repo -- both buttons at the top right of this page. Copy the SSH from the green button, and in your terminal type: `git clone <ssh from green button>`
+
+### Installing
+- Install the gem packages: `bundle install`
+- Create the database by running the following command in your terminal
+`rails db:{drop, create, migrate}`
+
+## Testing
+This project uses RSpec for testing. Test files live under `/spec` and mirror the directory structure of their corresponding files in `/app`.
+- Run RSpec with `bundle exec rspec` and all tests should pass.
 
 # Endpoints
 ## Weather Data for a City
@@ -108,7 +129,7 @@ The Back End API portion of a proposed SOA application to plan road trips. This 
 >```json
 >{
 >  "data": {
->    "id": nil,
+>    "id": null,
 >    "type": "image",
 >    "attributes": {
 >      "image": {
@@ -189,7 +210,7 @@ The Back End API portion of a proposed SOA application to plan road trips. This 
 >    "id": null,
 >    "type": "users",
 >    "attributes": {
->      "message": "Email is invalid",
+>      "message": "Email is invalid"
 >    },
 >    ...
 >  }]
@@ -246,7 +267,8 @@ The Back End API portion of a proposed SOA application to plan road trips. This 
 >    "id": null,
 >    "type": "users",
 >    "attributes": {
->      "message": "Invalid credentials",
+>      "message": "Invalid credentials"
+>    }
 >  }]
 >}
 >```
@@ -315,7 +337,8 @@ The Back End API portion of a proposed SOA application to plan road trips. This 
 >    "id": null,
 >    "type": "roadtrip",
 >    "attributes": {
->      "message": "Invalid api key",
+>      "message": "Invalid api key"
+>    }
 >  }]
 >}
 >```
