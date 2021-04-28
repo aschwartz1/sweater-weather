@@ -1,5 +1,3 @@
-require_relative '../../../facades/road_trip_facade'
-
 class Api::V1::RoadTripsController < ApplicationController
   protect_from_forgery with: :null_session
   before_action :validate_params_exist

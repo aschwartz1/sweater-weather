@@ -1,4 +1,3 @@
-require_relative '../../app/facades/road_trip_facade'
 require 'rails_helper'
 
 RSpec.describe 'Road Trip Facade' do

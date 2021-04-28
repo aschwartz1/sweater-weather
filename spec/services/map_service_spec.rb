@@ -1,5 +1,3 @@
-require_relative '../../app/services/map_service.rb'
-
 require 'rails_helper'
 
 RSpec.describe 'Forecast Service' do
