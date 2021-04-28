@@ -1,9 +1,13 @@
 class RoadTripFacade
   def self.create_trip(origin, destination)
     directions = fetch_directions(origin, destination)
-    eta_weather = fetch_eta_weather(directions.to[:latitude], directions.to[:longitude], directions.travel_time)
 
-    format_response(directions, eta_weather)
+    if directions.nil?
+      error_response(origin, destination)
+    else
+      eta_weather = fetch_eta_weather(directions.to[:latitude], directions.to[:longitude], directions.travel_time)
+      format_response(directions, eta_weather)
+    end
   end
 
   private_class_method
@@ -60,5 +64,15 @@ class RoadTripFacade
     # Comes in as <HH:MM:SS> and we want to format to 'X hours, Y minutes'
     hms = time.split(':')
     "#{hms[0].to_i} hours, #{hms[1].to_i} minutes"
+  end
+
+  def self.error_response(origin, destination)
+    OpenStruct.new({
+      id: nil,
+      start_city: origin,
+      end_city: destination,
+      travel_time: 'Impossible',
+      weather_at_eta: {}
+    })
   end
 end
