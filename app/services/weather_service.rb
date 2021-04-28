@@ -5,12 +5,12 @@ class WeatherService
     format_forecast_response(response, num_daily, num_hourly)
   end
 
-  def self.fetch_hourly(latitude, longitude, num_results: 9)
+  def self.fetch_hourly(latitude, longitude, num_results: 8)
     response = get_onecall(latitude, longitude)
     format_hourly_response(response, num_results)
   end
 
-  def self.fetch_daily(latitude, longitude, num_results: 9)
+  def self.fetch_daily(latitude, longitude, num_results: 5)
     response = get_onecall(latitude, longitude)
     format_daily_response(response, num_results)
   end

@@ -1,6 +1,6 @@
 require 'rails_helper'
 
-RSpec.describe 'Forecast Service' do
+RSpec.describe 'Map Service' do
   describe 'Geocoords for city' do
     describe 'happy path' do
       it 'returns correct structure and data' do
