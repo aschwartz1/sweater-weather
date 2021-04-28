@@ -7,7 +7,7 @@ The Back End API portion of a proposed SOA application to plan road trips. This 
   - [Alex Schwartz](https://www.linkedin.com/in/alex-s-77659758/)
  
 # Contents
-1. [Getting Started]
+1. [Getting Started](#getting-started)
     - [Prerequisites](#prerequisites)
     - [Installing](#installing)
     - [Testing](#testing)
