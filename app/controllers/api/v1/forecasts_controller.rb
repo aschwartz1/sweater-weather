@@ -1,6 +1,3 @@
-require_relative '../../../services/map_service'
-require_relative '../../../services/weather_service'
-
 class Api::V1::ForecastsController < ApplicationController
   before_action :validate_params
 

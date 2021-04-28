@@ -1,6 +1,3 @@
-require_relative '../services/map_service'
-require_relative '../services/weather_service'
-
 class RoadTripFacade
   def self.create_trip(origin, destination)
     directions = fetch_directions(origin, destination)
