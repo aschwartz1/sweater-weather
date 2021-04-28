@@ -49,7 +49,12 @@ RSpec.describe 'Forecast Service' do
     end
 
     describe 'sad path' do
-      xit 'returns some sort of error if route is impossible' do
+      it 'returns some sort of error if route is impossible' do
+        VCR.use_cassette('impossible_route') do
+          directions = MapService.fetch_directions(from: 'dallas,tx', to: 'london,uk')
+
+          expect(directions).to be_nil
+        end
       end
     end
   end

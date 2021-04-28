@@ -13,10 +13,20 @@ class MapService
       req.params[:to] = to
     end
 
-    format_directions(response)
+    if route_errors?(response)
+      nil
+    else
+      format_directions(response)
+    end
   end
 
   private_class_method
+
+  def self.route_errors?(response)
+    body = JSON.parse(response.body, symbolize_names: true)
+
+    body[:info][:messages].present?
+  end
 
   def self.map_connection
     @map_connection ||= Faraday.new 'http://www.mapquestapi.com' do |conn|

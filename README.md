@@ -265,6 +265,11 @@ The Back End API portion of a proposed SOA application to plan road trips. This 
     - `end_city` - destination, as found by MapQuest from `destination` request parameter
     - `travel_time` - travel time, as estimated by MapQuest
     - `weather_at_eta` - hash of `temperature` and `conditions` of destination city at eta (if leaving right now)
+- Impossible Route Response
+  - `200 OK`, nothing _failed_ but the route entered is not possible to road_trip
+  - Returns success format with...
+    - `"travel_time": "Impossible"`
+    - `"weather_at_eta": {}`
 
 >```
 >POST /api/v1/road_trip
